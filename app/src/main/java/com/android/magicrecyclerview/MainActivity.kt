@@ -3,24 +3,24 @@ package com.android.magicrecyclerview
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import com.android.magic_recyclerview.component.magic_recyclerview.GridEasyList
-import com.android.magic_recyclerview.component.magic_recyclerview.HorizontalEasyList
-import com.android.magic_recyclerview.component.magic_recyclerview.RecyclerType
-import com.android.magic_recyclerview.component.magic_recyclerview.VerticalEasyList
+import com.android.magic_recyclerview.component.list.GridEasyList
+import com.android.magic_recyclerview.component.list.HorizontalEasyList
+import com.android.magic_recyclerview.ListType
+import com.android.magic_recyclerview.component.list.VerticalEasyList
 import com.android.magic_recyclerview.model.Action
 import com.android.magicrecyclerview.model.Anime
 import com.android.magicrecyclerview.ui.AnimeCard
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             MagicRecyclerViewTheme {
-                var recyclerType by remember { mutableStateOf(RecyclerType.VERTICAL) }
+                var listType by remember { mutableStateOf(ListType.VERTICAL) }
 
                 Scaffold(
 
@@ -56,11 +56,13 @@ class MainActivity : ComponentActivity() {
 
                 ) {
 
-                    Surface(color = MaterialTheme.colors.background) {
+                    Surface(
+                        modifier = Modifier.padding(it),
+                        color = MaterialTheme.colors.background) {
 
                         Column {
 
-                            var tabIndex by remember { mutableStateOf(0) } // 1.
+                            var tabIndex by remember { mutableIntStateOf(0) } // 1.
                             val tabTitles = listOf("Vertical", "Horizontal", "Grid")
                             Column { // 2.
                                 TabRow(
@@ -76,18 +78,18 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                                 when (tabIndex) { // 6.
-                                    0 -> recyclerType = RecyclerType.VERTICAL
-                                    1 -> recyclerType = RecyclerType.HORIZONTAL
-                                    2 -> recyclerType = RecyclerType.GRID
+                                    0 -> listType = ListType.VERTICAL
+                                    1 -> listType = ListType.HORIZONTAL
+                                    2 -> listType = ListType.GRID
                                 }
                             }
 
 
 
-                            when (recyclerType) {
-                                RecyclerType.VERTICAL -> VerticalList(testList)
-                                RecyclerType.HORIZONTAL -> HorizontalList(testList)
-                                RecyclerType.GRID -> GridList(testList)
+                            when (listType) {
+                                ListType.VERTICAL -> VerticalList(testList)
+                                ListType.HORIZONTAL -> HorizontalList(testList)
+                                ListType.GRID -> GridList(testList)
                             }
                         }
 
@@ -113,8 +115,8 @@ fun VerticalList(list: List<Anime>) {
 
 
     val deleteAction1 = Action<Anime>(
-        { actionText("Delete") },
-        { actionIcon(R.drawable.ic_delete) },
+        text ="Archive",
+        iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_4),
         onClicked = { position, item ->
             listItem = listItem.filter {
@@ -125,8 +127,8 @@ fun VerticalList(list: List<Anime>) {
 
 
     val deleteAction2 = Action<Anime>(
-        { actionText("Delete") },
-        { actionIcon(R.drawable.ic_delete) },
+        text ="Archive",
+        iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_5),
         onClicked = { position, item ->
             listItem = listItem.filter {
@@ -137,8 +139,8 @@ fun VerticalList(list: List<Anime>) {
 
 
     val deleteAction3 = Action<Anime>(
-        { actionText("Delete") },
-        { actionIcon(R.drawable.ic_delete) },
+        text ="Archive",
+        iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_6),
         onClicked = { position, item ->
             listItem = listItem.filter {
@@ -148,8 +150,8 @@ fun VerticalList(list: List<Anime>) {
         })
 
     val archiveAction1 = Action<Anime>(
-        { actionText("Archive") },
-        { actionIcon(R.drawable.ic_archive) },
+        text ="Archive",
+        iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_1),
         onClicked = { position, item ->
             listItem = listItem.filter {
@@ -158,9 +160,11 @@ fun VerticalList(list: List<Anime>) {
 
         })
 
+    Icons.Default.Delete
+
     val archiveAction2 = Action<Anime>(
-        { actionText("Archive") },
-        { actionIcon(R.drawable.ic_archive) },
+        text ="Archive",
+        iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_2),
         onClicked = { position, item ->
             listItem = listItem.filter {
@@ -170,8 +174,8 @@ fun VerticalList(list: List<Anime>) {
         })
 
     val archiveAction3 = Action<Anime>(
-        { actionText("Archive") },
-        { actionIcon(R.drawable.ic_archive) },
+        text ="Archive",
+        iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_3),
         onClicked = { position, item ->
             listItem = listItem.filter {
@@ -202,32 +206,11 @@ fun VerticalList(list: List<Anime>) {
         },
         startActions = listOf(deleteAction1, deleteAction2, deleteAction3),
         endActions = listOf(archiveAction1, archiveAction2, archiveAction3),
-        paddingVertical = 8f
     )
 
     Handler(Looper.getMainLooper()).postDelayed({
         isLoading = false
     }, 2000)
-}
-
-@Composable
-fun actionIcon(@DrawableRes id: Int) {
-    Icon(
-        painter = painterResource(id = id),
-        tint = Color.White,
-        contentDescription = "Icon"
-    )
-
-
-}
-
-@Composable
-fun actionText(text: String?) {
-    Text(
-        text = text ?: "",
-        style = MaterialTheme.typography.button,
-        color = Color.White
-    )
 }
 
 @Composable
@@ -264,8 +247,6 @@ fun GridList(list: List<Anime>) {
         view = { AnimeGridCard(anime = it) },
         emptyView = { emptyView() },
         isLoading = isLoading,
-        paddingBetweenItems = 8f,
-        paddingVertical = 8f,
         columnCount = 2,
         scrollTo = 0,
         onItemClicked = {item,position->
@@ -279,9 +260,3 @@ fun GridList(list: List<Anime>) {
         isLoading = false
     }, 1000)
 }
-
-@Composable
-fun tabs() {
-
-}
-

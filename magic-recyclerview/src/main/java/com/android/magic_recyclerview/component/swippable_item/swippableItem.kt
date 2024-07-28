@@ -153,16 +153,15 @@ fun <T> SwappableItem(
 
     ) {
 
-        if ((swappableState.currentValue == SwipeDirection.LEFT_TO_RIGHT || swappableState.currentValue == SwipeDirection.RIGHT_TO_LEFT) && !swappableState.isAnimationRunning && swappableItemOffset.value.absoluteValue == middleSwipeItem.value) {
+        if ((swappableState.currentValue == SwipeDirection.LEFT_TO_RIGHT || swappableState.currentValue == SwipeDirection.RIGHT_TO_LEFT)
+            && !swappableState.isAnimationRunning && swappableItemOffset.value.absoluteValue == middleSwipeItem.value) {
 
             if (swappableState.currentValue == SwipeDirection.LEFT_TO_RIGHT) {
-
                 if (isRTL) {
                     onExpanded.invoke(ActionRowType.END, item)
                 } else {
                     onExpanded.invoke(ActionRowType.START, item)
                 }
-
             }
 
             if (swappableState.currentValue == SwipeDirection.RIGHT_TO_LEFT) {
@@ -173,12 +172,14 @@ fun <T> SwappableItem(
                 }
             }
 
-
-
             wasExtendState.value = true
         }
 
-        if (swappableState.currentValue == SwipeDirection.NON && !swappableState.isAnimationRunning && swappableItemOffset.value.absoluteValue == 0 && !isActionClickedState.value && wasExtendState.value) {
+        if (swappableState.currentValue == SwipeDirection.NON &&
+            !swappableState.isAnimationRunning &&
+            swappableItemOffset.value.absoluteValue == 0 &&
+            !isActionClickedState.value &&
+            wasExtendState.value) {
             onCollapsed.invoke(item)
             wasExtendState.value = false
         }

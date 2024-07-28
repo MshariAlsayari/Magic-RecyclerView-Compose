@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk  rootProject.ext.compileSdk
 
     defaultConfig {
         applicationId "com.android.magicrecyclerview"
-        minSdk 21
-        targetSdk 31
+        minSdk  rootProject.ext.minSdk
+        targetSdk rootProject.ext.targetSdk
         versionCode 1
         versionName "1.0"
 
@@ -31,14 +31,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
-        useIR = true
     }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion '1.5.21'
+        kotlinCompilerExtensionVersion compose_compiler_version
     }
     packagingOptions {
         resources {

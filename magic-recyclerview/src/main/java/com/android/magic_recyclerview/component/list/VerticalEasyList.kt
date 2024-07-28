@@ -1,4 +1,4 @@
-package com.android.magic_recyclerview.component.magic_recyclerview
+package com.android.magic_recyclerview.component.list
 
 import android.os.Handler
 import android.os.Looper
@@ -9,12 +9,17 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -34,6 +39,8 @@ import com.android.magic_recyclerview.Constants.PADDING_HORIZONTAL
 import com.android.magic_recyclerview.Constants.PADDING_VERTICAL
 import com.android.magic_recyclerview.component.action_row.ActionRowType
 import com.android.magic_recyclerview.component.action_row.ActionsRow
+import com.android.magic_recyclerview.component.magic_recyclerview.EmptyView
+import com.android.magic_recyclerview.component.magic_recyclerview.LoadingView
 import com.android.magic_recyclerview.component.swippable_item.SwappableItem
 import com.android.magic_recyclerview.model.Action
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -86,9 +93,6 @@ fun <T> VerticalEasyList(
     isLoading                   : Boolean = false,
     isRefreshing                : Boolean = false,
     onRefresh                   : (() -> Unit)? = null,
-    paddingBetweenItems         : Float = PADDING_BETWEEN_ITEMS,
-    paddingVertical             : Float = PADDING_VERTICAL,
-    paddingHorizontal           : Float = PADDING_HORIZONTAL,
     scrollTo                    : Int = 0,
 ) {
 
@@ -101,12 +105,14 @@ fun <T> VerticalEasyList(
     }
 
     SwipeRefresh(
+        modifier = Modifier.fillMaxSize(),
         state = rememberSwipeRefreshState(isRefreshing),
         swipeEnabled = onRefresh != null,
         onRefresh = { onRefresh?.invoke() },
     ) {
 
         Box(
+            modifier = modifier,
             contentAlignment = Alignment.Center
         ) {
 
@@ -115,7 +121,6 @@ fun <T> VerticalEasyList(
             else{
                 if (list.isNotEmpty()) {
                     LazyList(
-                    modifier                    = modifier,
                     list                        = list,
                     view                        = view,
                     dividerView                 = dividerView,
@@ -126,9 +131,6 @@ fun <T> VerticalEasyList(
                     onItemCollapsed             = onItemCollapsed,
                     onItemExpanded              = onItemExpanded,
                     actionBackgroundRadiusCorner= actionBackgroundRadiusCorner,
-                    paddingBetweenItems         = paddingBetweenItems,
-                    paddingVertical             = paddingVertical,
-                    paddingHorizontal           = paddingHorizontal,
                     scrollTo                    = scrollTo,
                     )
                 } else {
@@ -149,7 +151,7 @@ fun <T> VerticalEasyList(
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun <T>LazyList(modifier                    : Modifier,
+fun <T>LazyList(
                 list                        : List<T>,
                 view                        : @Composable (T) -> Unit,
                 dividerView                 : (@Composable () -> Unit)? = null,
@@ -160,36 +162,18 @@ fun <T>LazyList(modifier                    : Modifier,
                 onItemCollapsed             : ((item: T, position: Int) -> Unit)? = null,
                 onItemExpanded              : ((item: T, position: Int, type: ActionRowType) -> Unit)? = null,
                 actionBackgroundRadiusCorner: Float = 0f,
-                paddingBetweenItems         : Float = PADDING_BETWEEN_ITEMS,
-                paddingVertical             : Float = PADDING_VERTICAL,
-                paddingHorizontal           : Float = PADDING_HORIZONTAL,
                 scrollTo                    : Int = 0,){
 
 
     val listState       = rememberLazyListState()
     val coroutineScope  = rememberCoroutineScope()
     val isRTL           = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val isActionClicked = remember { mutableStateOf(false) }
-
-
+    val isActionClicked = rememberSaveable { mutableStateOf(false) }
 
     LazyColumn(
-        modifier            = modifier,
-        state               = listState,
-        verticalArrangement = Arrangement.spacedBy(paddingBetweenItems.dp),
-        contentPadding      = PaddingValues(
-        horizontal          = paddingHorizontal.dp,
-        vertical            = paddingVertical.dp
-        )
+        state = listState
     ) {
-
-
         itemsIndexed(list) {  index , item ->
-            Column(modifier = modifier,
-                   horizontalAlignment = Alignment.CenterHorizontally,
-                   verticalArrangement = Arrangement.Center
-            ) {
-
                 ConstraintLayout {
                     val (actionContainer, swappableItemContainer, divider) = createRefs()
                     Row(
@@ -232,8 +216,8 @@ fun <T>LazyList(modifier                    : Modifier,
                     }
 
 
-                    SwappableItem<T>(
-                        modifier = modifier.constrainAs(swappableItemContainer) {
+                    SwappableItem(
+                        modifier = Modifier.constrainAs(swappableItemContainer) {
                             top   .linkTo(parent.top)
                             bottom.linkTo(parent.bottom)
                             start .linkTo(parent.start)
@@ -253,7 +237,6 @@ fun <T>LazyList(modifier                    : Modifier,
                     if (index != list.lastIndex && dividerView != null) {
                         Surface(
                             modifier = Modifier
-                                .padding(top = paddingBetweenItems.dp)
                                 .constrainAs(divider) {
                                     start.linkTo(parent.start)
                                     end.linkTo(parent.end)
@@ -266,277 +249,12 @@ fun <T>LazyList(modifier                    : Modifier,
                     }
 
                 }
-
-
-
-            }
-
-
-
-
         }
 
 
         coroutineScope.launch {
             listState.animateScrollToItem(scrollTo)
         }
-
-
     }
 
 }
-
-fun isLastItemVisible(lazyListState: LazyListState): Boolean {
-    val lastItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
-    return lastItem == null || lastItem.size + lastItem.offset <= lazyListState.layoutInfo.viewportEndOffset
-}
-
-/***
- * modifier - the modifier to apply to this layout.
- * list -  list of data.
- * view - the data view holder.
- * dividerView - (optional) divider between items.
- * emptyView - (optional) emptyview if the list is empty.
- * paddingBetweenItems - padding between items default is 8f.
- * paddingVertical - padding on top and bottom of the whole list default is 0.
- * paddingHorizontal - padding on left and right of the whole list default is 0.
- * isLoading - show loading content progress.
- * loadingProgress - (optional) if null will show CircularProgressIndicator().
- * scrollTo - scroll to item default is 0.
- */
-@Composable
-fun <T> HorizontalEasyList(
-    modifier: Modifier = Modifier,
-    list: List<T>,
-    view: @Composable (T) -> Unit,
-    emptyView: (@Composable () -> Unit)? = null,
-    dividerView: (@Composable () -> Unit)? = null,
-    paddingBetweenItems: Float = PADDING_BETWEEN_ITEMS,
-    paddingVertical: Float = PADDING_VERTICAL,
-    paddingHorizontal: Float = PADDING_HORIZONTAL,
-    isLoading: Boolean = false,
-    loadingProgress: (@Composable () -> Unit)? = null,
-    scrollTo: Int = 0,
-) {
-
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-    val lazyRow: @Composable () -> Unit = {
-        LazyRow(
-            modifier = modifier,
-            state = listState,
-            horizontalArrangement = Arrangement.spacedBy(paddingBetweenItems.dp),
-            contentPadding = PaddingValues(
-                horizontal = paddingHorizontal.dp,
-                vertical = paddingVertical.dp
-            )
-        ) {
-            itemsIndexed(list) { index, item ->
-                view(item)
-                if (index != list.lastIndex) {
-                    Surface(modifier = Modifier.padding(start = paddingBetweenItems.dp)) {
-                        dividerView?.invoke()
-                    }
-
-                }
-
-
-            }
-
-            coroutineScope.launch {
-                listState.animateScrollToItem(scrollTo)
-            }
-
-        }
-
-    }
-
-    Box(contentAlignment = Alignment.Center) {
-        if (isLoading)
-            LoadingView(loadingProgress)
-        else {
-            if (list.isNotEmpty()) {
-                lazyRow()
-            } else {
-                EmptyView(emptyView)
-            }
-        }
-    }
-
-
-}
-
-/***
- * modifier - the modifier to apply to this layout.
- * list -  list of data.
- * view - the data view holder.
- * dividerView - (optional) divider between items.
- * emptyView - (optional) emptyview if the list is empty.
- * actionBackgroundHeight - height of the actions background.
- * isRefreshing - show progress of the swipeRefreshLayout.
- * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
- * paddingBetweenItems - padding between items default is 8f.
- * paddingVertical - padding on top and bottom of the whole list default is 0.
- * paddingHorizontal - padding on left and right of the whole list default is 0.
- * scrollTo - scroll to item default is 0.
- * isLoading - show loading content progress.
- * loadingProgress - (optional) if null will show CircularProgressIndicator().
- * columnCount - number of columns default is 2
- */
-@ExperimentalFoundationApi
-@Composable
-fun <T> GridEasyList(
-    modifier: Modifier = Modifier,
-    list: List<T>,
-    view: @Composable (T) -> Unit,
-    emptyView: @Composable (() -> Unit)? = null,
-    paddingBetweenItems: Float = PADDING_BETWEEN_ITEMS,
-    paddingVertical: Float = PADDING_VERTICAL,
-    paddingHorizontal: Float = PADDING_HORIZONTAL,
-    columnCount: Int = COLUMN_COUNT,
-    isRefreshing: Boolean = false,
-    onRefresh: (() -> Unit)? = null,
-    isLoading: Boolean = false,
-    loadingProgress: (@Composable () -> Unit)? = null,
-    onItemClicked               : (item: T, position: Int) -> Unit,
-    scrollTo: Int = 0,
-) {
-
-
-            SwipeRefresh(
-                state = rememberSwipeRefreshState(isRefreshing),
-                swipeEnabled = onRefresh != null,
-                onRefresh = { onRefresh?.invoke() },
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-
-                    if (isLoading)
-                        LoadingView(loadingProgress)
-                    else{
-                        if (list.isNotEmpty()){
-                            LazyGridList(
-                                modifier = modifier,
-                                list = list,
-                                view = view,
-                                paddingBetweenItems = paddingBetweenItems,
-                                paddingVertical = paddingVertical,
-                                paddingHorizontal = paddingHorizontal,
-                                columnCount = columnCount,
-                                onItemClicked = onItemClicked,
-                                scrollTo = scrollTo
-                            )
-
-                        }else
-                            EmptyView(emptyView)
-                    }
-                }
-
-            }
-
-
-
-
-
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun <T>LazyGridList(   modifier: Modifier = Modifier,
-                       list: List<T>,
-                       view: @Composable (T) -> Unit,
-                       paddingBetweenItems: Float = PADDING_BETWEEN_ITEMS,
-                       paddingVertical: Float = PADDING_VERTICAL,
-                       paddingHorizontal: Float = PADDING_HORIZONTAL,
-                       columnCount: Int = COLUMN_COUNT,
-                       onItemClicked               : (item: T, position: Int) -> Unit,
-                       scrollTo: Int = 0,){
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-
-    LazyVerticalGrid(
-        modifier = modifier,
-        state = listState,
-        cells = GridCells.Fixed(columnCount),
-        verticalArrangement = Arrangement.spacedBy(paddingBetweenItems.dp),
-        horizontalArrangement = Arrangement.spacedBy(paddingBetweenItems.dp),
-        contentPadding = PaddingValues(
-            vertical = paddingVertical.dp,
-            horizontal = paddingHorizontal.dp
-        )
-    ) {
-        itemsIndexed(list) { index, item ->
-            Column(modifier = modifier,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Box(modifier = modifier.clickable {
-                    onItemClicked(item, index)
-                }, contentAlignment = Alignment.Center,
-                ) {
-                    view(item)
-                }
-
-            }
-
-
-
-
-        }
-
-        coroutineScope.launch {
-            listState.animateScrollToItem(scrollTo)
-        }
-    }
-
-}
-
-
-
-@Composable
-fun PaginationLoadingView(view: (@Composable () -> Unit)?=null) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (view != null ){
-            view()
-        }else{
-            CircularProgressIndicator(modifier = Modifier
-                .padding(vertical = 20.dp)
-                .size(20.dp), strokeWidth = 2.dp)
-        }
-    }
-}
-
-@Composable
-fun LoadingView(view: (@Composable () -> Unit)?=null) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        if (view != null ){
-            view()
-        }else{
-            CircularProgressIndicator()
-        }
-    }
-}
-
-@Composable
-fun EmptyView(view: (@Composable () -> Unit)? = null) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        view?.invoke()
-    }
-}
-

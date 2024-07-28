@@ -20,7 +20,7 @@ import androidx.compose.ui.res.colorResource
 import com.android.magic_recyclerview.component.list.GridEasyList
 import com.android.magic_recyclerview.component.list.HorizontalEasyList
 import com.android.magic_recyclerview.ListType
-import com.android.magic_recyclerview.component.list.VerticalEasyList
+import com.android.magic_recyclerview.component.list.verical.swapable.VerticalEasyList
 import com.android.magic_recyclerview.model.Action
 import com.android.magicrecyclerview.model.Anime
 import com.android.magicrecyclerview.ui.AnimeCard
@@ -118,9 +118,11 @@ fun VerticalList(list: List<Anime>) {
         text ="Archive",
         iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_4),
-        onClicked = { position, item ->
-            listItem = listItem.filter {
-                it.anime_id != item.anime_id
+        onClicked = { item ->
+            if(item is Anime){
+                listItem = listItem.filter {
+                    it.anime_id != item.anime_id
+                }
             }
 
         })
@@ -130,9 +132,11 @@ fun VerticalList(list: List<Anime>) {
         text ="Archive",
         iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_5),
-        onClicked = { position, item ->
-            listItem = listItem.filter {
-                it.anime_id != item.anime_id
+        onClicked = {  item ->
+            if(item is Anime){
+                listItem = listItem.filter {
+                    it.anime_id != item.anime_id
+                }
             }
 
         })
@@ -142,9 +146,11 @@ fun VerticalList(list: List<Anime>) {
         text ="Archive",
         iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_6),
-        onClicked = { position, item ->
-            listItem = listItem.filter {
-                it.anime_id != item.anime_id
+        onClicked = { item ->
+            if(item is Anime){
+                listItem = listItem.filter {
+                    it.anime_id != item.anime_id
+                }
             }
 
         })
@@ -153,9 +159,11 @@ fun VerticalList(list: List<Anime>) {
         text ="Archive",
         iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_1),
-        onClicked = { position, item ->
-            listItem = listItem.filter {
-                it.anime_id != item.anime_id
+        onClicked = { item ->
+            if(item is Anime){
+                listItem = listItem.filter {
+                    it.anime_id != item.anime_id
+                }
             }
 
         })
@@ -166,10 +174,13 @@ fun VerticalList(list: List<Anime>) {
         text ="Archive",
         iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_2),
-        onClicked = { position, item ->
-            listItem = listItem.filter {
-                it.anime_id != item.anime_id
+        onClicked = { item ->
+            if(item is Anime){
+                listItem = listItem.filter {
+                    it.anime_id != item.anime_id
+                }
             }
+
 
         })
 
@@ -177,9 +188,11 @@ fun VerticalList(list: List<Anime>) {
         text ="Archive",
         iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_3),
-        onClicked = { position, item ->
-            listItem = listItem.filter {
-                it.anime_id != item.anime_id
+        onClicked = { item ->
+            if(item is Anime){
+                listItem = listItem.filter {
+                    it.anime_id != item.anime_id
+                }
             }
 
         })
@@ -188,10 +201,10 @@ fun VerticalList(list: List<Anime>) {
     VerticalEasyList(
         modifier = Modifier,
         list = listItem,
-        onItemClicked = { item, position ->
+        onItemClicked = { item ->
 
         },
-        onItemDoubleClicked = { item, position ->
+        onItemDoubleClicked = { item ->
 
         },
         view = { AnimeCard(anime = it) },

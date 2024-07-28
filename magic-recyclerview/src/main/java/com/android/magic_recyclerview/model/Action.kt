@@ -28,7 +28,7 @@ data class Action<T>(
     val actionSize: Dp = ACTION_ICON_SIZE.dp,
     val visible: Boolean= true,
     val clickable: Boolean= true,
-    val onClicked: ((position: Int, item: T) -> Unit)? = null,
+    val onClicked: ((item: Any) -> Unit)? = null,
 )
 
 

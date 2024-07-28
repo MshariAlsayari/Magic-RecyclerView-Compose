@@ -19,7 +19,6 @@ import com.android.magic_recyclerview.model.Action
 fun <T> ActionsRow(
     modifier: Modifier,
     item: T,
-    position: Int,
     actions: List<Action<T>>,
     radiusCorner: Float = 0f,
     isActionClicked: (() -> Unit)? = null
@@ -34,8 +33,6 @@ fun <T> ActionsRow(
             modifier = modifier.fillMaxHeight(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-
             actions.forEach {
                 ActionItem(
                     modifier = Modifier
@@ -44,20 +41,15 @@ fun <T> ActionsRow(
                         .fillMaxHeight()
                         .size(it.actionSize),
                     action = it,
-                    onClicked = { position, item ->
+                    onClicked = { item ->
                         isActionClicked?.invoke()
                         Handler(Looper.getMainLooper()).postDelayed({
-                            it.onClicked?.invoke(
-                                position,
-                                item
-                            )
+                            it.onClicked?.invoke(item as Any)
                         }, Constants.SWIPE_ANIMATION_DURATION.toLong())
 
 
                 },
-                item = item,
-                position = position
-                )
+                item = item)
             }
 
 

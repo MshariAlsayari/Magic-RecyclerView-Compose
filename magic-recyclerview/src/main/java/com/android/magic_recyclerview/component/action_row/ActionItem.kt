@@ -25,15 +25,66 @@ import com.android.magic_recyclerview.model.getText
 fun <T> ActionItem(
     modifier: Modifier = Modifier,
     action: Action<T>,
-    onClicked: (position: Int, item: T) -> Unit,
-    item: T,
-    position: Int
+    onClicked: (item: T) -> Unit,
+    item: T
 ) {
 
     IconButton(
         modifier = modifier,
         onClick = {
-            onClicked(position, item)
+            onClicked(item)
+        },
+        content = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val icon = action.getIcon()
+                val text =  action.getText()
+                if(icon != null){
+                    if(icon is Int){
+                        Icon(
+                            painter = painterResource(id = icon),
+                            contentDescription = null
+                        )
+                    }
+
+                    if(icon is ImageVector){
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = null
+                        )
+                    }
+                }
+
+
+                if(text != null){
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.button,
+                        color = Color.White
+                    )
+                }
+            }
+        }
+    )
+
+
+}
+
+
+@Composable
+fun <T> MenuActionItem(
+    modifier: Modifier = Modifier,
+    action: Action<T>,
+    onClicked: (item: List<T>) -> Unit,
+    items: List<T>,
+) {
+
+    IconButton(
+        modifier = modifier,
+        onClick = {
+            onClicked(items)
         },
         content = {
             Column(
@@ -81,7 +132,7 @@ fun ActionItemPreview(){
         text ="Archive",
         iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_2),
-        onClicked = { position, item ->
+        onClicked = {  item ->
 
         })
 }

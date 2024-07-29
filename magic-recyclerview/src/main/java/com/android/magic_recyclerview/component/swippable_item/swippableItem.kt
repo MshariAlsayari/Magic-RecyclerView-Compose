@@ -34,11 +34,11 @@ import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class,
+@OptIn(ExperimentalMaterialApi::class,
     ExperimentalFoundationApi::class
 )
 @Composable
-fun <T> SwappableItem(
+internal fun <T> SwappableItem(
     modifier: Modifier = Modifier,
     item: T,
     mainItem: @Composable () -> Unit,
@@ -55,7 +55,7 @@ fun <T> SwappableItem(
     },
     velocityThreshold: Dp = Constants.VELOCITY.dp,
     onCollapsed: (item: T) -> Unit,
-    onExpanded: (type: ActionRowType, item: T) -> Unit
+    onExpanded: (item: T) -> Unit
 ) {
 
     val coroutineScope = rememberCoroutineScope()
@@ -162,17 +162,17 @@ fun <T> SwappableItem(
 
             if (swappableState.currentValue == SwipeDirection.LEFT_TO_RIGHT) {
                 if (isRTL) {
-                    onExpanded.invoke(ActionRowType.END, item)
+                    onExpanded.invoke(item)
                 } else {
-                    onExpanded.invoke(ActionRowType.START, item)
+                    onExpanded.invoke(item)
                 }
             }
 
             if (swappableState.currentValue == SwipeDirection.RIGHT_TO_LEFT) {
                 if (isRTL) {
-                    onExpanded.invoke(ActionRowType.START, item)
+                    onExpanded.invoke(item)
                 } else {
-                    onExpanded.invoke(ActionRowType.END, item)
+                    onExpanded.invoke(item)
                 }
             }
 

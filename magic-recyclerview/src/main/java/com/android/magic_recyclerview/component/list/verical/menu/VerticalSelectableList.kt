@@ -12,37 +12,37 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import com.android.magic_recyclerview.SelectableItemBase
-import com.android.magic_recyclerview.component.magic_recyclerview.DropdownMenu
 import com.android.magic_recyclerview.component.magic_recyclerview.EmptyView
 import com.android.magic_recyclerview.component.magic_recyclerview.LoadingView
-import com.android.magic_recyclerview.model.Action
+import com.android.magic_recyclerview.component.magic_recyclerview.UnSelectableItem
+import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableListStyle
+import com.android.magic_recyclerview.model.SwipableListStyle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun <T:SelectableItemBase> SelectableVerticalList(
+fun <T:SelectableItemBase> VerticalSelectableList(
     modifier: Modifier = Modifier,
     list: List<T>,
-    selectMenuItem: T,
     view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
+    selectedSelectionView: (@Composable () -> Unit)? = null,
+    unselectedSelectionView: (@Composable () -> Unit)? = null,
     emptyView: (@Composable () -> Unit)? = null,
     loadingProgress: (@Composable () -> Unit)? = null,
     onItemClicked: (item: T, position: Int) -> Unit,
     onItemLongClicked: (item: T, position: Int) -> Unit,
-    onDismissMenu: () -> Unit,
-    actions: List<Action<T>> = listOf(),
-    actionBackgroundRadiusCorner: Float = 0f,
+    actions: List<MenuAction<T>> = listOf(),
     isMultiSelectionMode: Boolean = false,
+    style: SelectableListStyle = SelectableListStyle.Default,
     isLoading: Boolean = false,
     isRefreshing: Boolean = false,
     onRefresh: (() -> Unit)? = null,
@@ -72,15 +72,15 @@ fun <T:SelectableItemBase> SelectableVerticalList(
 
                         SelectableLazyList(
                             list = list,
-                            selectMenuItem =selectMenuItem,
                             view = view,
                             dividerView = dividerView,
-                            actions = actions,
+                            selectedSelectionView=selectedSelectionView,
+                            unselectedSelectionView = unselectedSelectionView,
                             isMultiSelectionMode = isMultiSelectionMode,
+                            style = style,
                             scrollTo = scrollTo,
                             onItemClicked = onItemClicked,
                             onItemLongClicked = onItemLongClicked,
-                            onDismissMenu = onDismissMenu
                         )
 
                         AnimatedVisibility(
@@ -91,6 +91,7 @@ fun <T:SelectableItemBase> SelectableVerticalList(
                         ) {
                             ActionContainer(
                                 selectedItem = list.filter { (it as SelectableItemBase).isSelected },
+                                style = style,
                                 actions = actions
                             )
                         }
@@ -112,23 +113,22 @@ fun <T:SelectableItemBase> SelectableVerticalList(
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun <T> SelectableLazyList(
+private fun <T> SelectableLazyList(
     list: List<T>,
-    selectMenuItem: T,
     view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
+    selectedSelectionView: (@Composable () -> Unit)? = null,
+    unselectedSelectionView: (@Composable () -> Unit)? = null,
     isMultiSelectionMode: Boolean = false,
+    style: SelectableListStyle = SelectableListStyle.Default,
     scrollTo: Int = 0,
-    actions: List<Action<T>> = listOf(),
     onItemClicked: (item: T, position: Int) -> Unit,
     onItemLongClicked: (item: T, position: Int) -> Unit,
-    onDismissMenu: () -> Unit,
 ) {
 
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    val isActionClicked = rememberSaveable { mutableStateOf(false) }
 
 
     LazyColumn(
@@ -136,23 +136,30 @@ fun <T> SelectableLazyList(
     ) {
         itemsIndexed(list) { index, item ->
 
+            if((item as SelectableItemBase).isSelectable){
+                Box(modifier = Modifier.combinedClickable (
+                    onClick = {
+                        onItemClicked(item,index)
+                    },
+                    onLongClick = {
+                        onItemLongClicked(item,index)
+                    })) {
 
-            Box(modifier = Modifier.combinedClickable (
-                onClick = {
-                    onItemClicked(item,index)
-                },
-                onLongClick = {
-                    onItemLongClicked(item,index)
-                })) {
-
-                SelectableListItem(
-                    item = item,
-                    view=view,
-                    dividerView=dividerView,
-                    isLastItem = index == list.lastIndex,
-                    isMultiSelectionMode=isMultiSelectionMode
-                )
+                    SelectableListItem(
+                        item = item,
+                        view=view,
+                        selectedSelectionView=selectedSelectionView,
+                        unselectedSelectionView = unselectedSelectionView,
+                        style = style,
+                        dividerView=dividerView,
+                        isLastItem = index == list.lastIndex,
+                        isMultiSelectionMode=isMultiSelectionMode
+                    )
+                }
+            }else{
+                UnSelectableItem(view = view, item = item)
             }
+
         }
 
         coroutineScope.launch {

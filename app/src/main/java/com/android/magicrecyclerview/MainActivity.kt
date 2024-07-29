@@ -1,8 +1,7 @@
 package com.android.magicrecyclerview
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -10,23 +9,31 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import com.android.magic_recyclerview.component.list.GridEasyList
 import com.android.magic_recyclerview.component.list.HorizontalEasyList
-import com.android.magic_recyclerview.ListType
-import com.android.magic_recyclerview.component.list.verical.swapable.VerticalEasyList
-import com.android.magic_recyclerview.model.Action
+import com.android.magic_recyclerview.component.list.verical.menu.VerticalSelectableList
+import com.android.magic_recyclerview.component.list.verical.swapable.VerticalSwipableList
+import com.android.magic_recyclerview.model.ActionIconStyle
+import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableListStyle
+import com.android.magic_recyclerview.model.SwipableAction
+import com.android.magic_recyclerview.model.SwipableListStyle
+import com.android.magic_recyclerview.model.SwipeBackgroundStyle
 import com.android.magicrecyclerview.model.Anime
 import com.android.magicrecyclerview.ui.AnimeCard
 import com.android.magicrecyclerview.ui.AnimeGridCard
 import com.android.magicrecyclerview.ui.emptyView
 import com.android.magicrecyclerview.ui.theme.MagicRecyclerViewTheme
+import kotlinx.coroutines.delay
 
 
 var DEFAULT_LIST = DataProvider.itemList
@@ -39,16 +46,15 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val testList = mutableListOf<Anime>()
-        for (i in 1..5){
+        for (i in 1..5) {
             testList.addAll(DEFAULT_LIST.map { it })
         }
 
         setContent {
             MagicRecyclerViewTheme {
-                var listType by remember { mutableStateOf(ListType.VERTICAL) }
+                var listType by rememberSaveable { mutableStateOf(ListType.VERTICAL_SWIPE) }
 
                 Scaffold(
-
                     topBar = {
                         TopAppBar(title = { Text(text = "Easy List") })
 
@@ -58,12 +64,14 @@ class MainActivity : ComponentActivity() {
 
                     Surface(
                         modifier = Modifier.padding(it),
-                        color = MaterialTheme.colors.background) {
+                        color = MaterialTheme.colors.background
+                    ) {
 
                         Column {
 
                             var tabIndex by remember { mutableIntStateOf(0) } // 1.
-                            val tabTitles = listOf("Vertical", "Horizontal", "Grid")
+                            val tabTitles =
+                                listOf("Vertical Swipe", "Vertical Select", "Horizontal", "Grid")
                             Column { // 2.
                                 TabRow(
                                     selectedTabIndex = tabIndex
@@ -78,16 +86,18 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                                 when (tabIndex) { // 6.
-                                    0 -> listType = ListType.VERTICAL
-                                    1 -> listType = ListType.HORIZONTAL
-                                    2 -> listType = ListType.GRID
+                                    0 -> listType = ListType.VERTICAL_SWIPE
+                                    1 -> listType = ListType.VERTICAL_SELECT
+                                    2 -> listType = ListType.HORIZONTAL
+                                    3 -> listType = ListType.GRID
                                 }
                             }
 
 
 
                             when (listType) {
-                                ListType.VERTICAL -> VerticalList(testList)
+                                ListType.VERTICAL_SWIPE -> VerticalList(testList)
+                                ListType.VERTICAL_SELECT -> VerticalSelectList(testList)
                                 ListType.HORIZONTAL -> HorizontalList(testList)
                                 ListType.GRID -> GridList(testList)
                             }
@@ -108,99 +118,105 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun VerticalList(list: List<Anime>) {
 
-    var listItem by remember { mutableStateOf(list) }
-    var isLoading by remember { mutableStateOf(true) }
-    var isRefreshing by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    var isLoading by rememberSaveable { mutableStateOf(true) }
+    var isRefreshing by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = isLoading) {
+        if (isLoading) {
+            delay(2000)
+            isLoading = false
+        }
+    }
+
+    LaunchedEffect(key1 = isRefreshing) {
+        if (isRefreshing) {
+            delay(2000)
+            isRefreshing = false
+        }
+    }
 
 
+    val startArchive = SwipableAction<Anime>(
+        text = "Archive",
+        iconRes = R.drawable.ic_archive,
+        actionIconStyle = ActionIconStyle.Default.copy(
+            color = Color.White
+        ),
+        actionTextStyle = TextStyle().copy(
+            color = Color.White
+        ),
+        onClicked = { item ->
+            //implement a function
+            Toast.makeText(context, "The start Archive action was clicked", Toast.LENGTH_SHORT)
+                .show()
+        })
 
-    val deleteAction1 = Action<Anime>(
-        text ="Archive",
+
+    val startDelete = SwipableAction<Anime>(
+        text = "Delete",
+        iconRes = R.drawable.ic_delete,
+        actionIconStyle = ActionIconStyle.Default.copy(
+            color = Color.White
+        ),
+        actionTextStyle = TextStyle().copy(
+            color = Color.White
+        ),
+        onClicked = { item ->
+            //implement a function
+            Toast.makeText(context, "The start Delete action was clicked", Toast.LENGTH_SHORT)
+                .show()
+        })
+
+
+    val startEdit = SwipableAction<Anime>(
+        text = "Edit",
+        iconRes = R.drawable.ic_edit,
+        actionIconStyle = ActionIconStyle.Default.copy(
+            color = Color.White
+        ),
+        actionTextStyle = TextStyle().copy(
+            color = Color.White
+        ),
+        onClicked = { item ->
+            //implement a function
+            Toast.makeText(context, "The start Edit action was clicked", Toast.LENGTH_SHORT).show()
+        })
+
+    val endArchive = SwipableAction<Anime>(
+        text = "Archive",
         iconRes = R.drawable.ic_archive,
         backgroundColor = colorResource(R.color.color_action_4),
+        actionIconStyle = ActionIconStyle.Default.copy(
+            color = Color.Black
+        ),
+        actionTextStyle = TextStyle().copy(
+            color = Color.Black
+        ),
         onClicked = { item ->
-            if(item is Anime){
-                listItem = listItem.filter {
-                    it.anime_id != item.anime_id
-                }
-            }
-
+            Toast.makeText(context, "The end Archive action was clicked", Toast.LENGTH_SHORT).show()
         })
 
 
-    val deleteAction2 = Action<Anime>(
-        text ="Archive",
-        iconRes = R.drawable.ic_archive,
+    val endDelete = SwipableAction<Anime>(
+        text = "Delete",
+        iconRes = R.drawable.ic_delete,
         backgroundColor = colorResource(R.color.color_action_5),
-        onClicked = {  item ->
-            if(item is Anime){
-                listItem = listItem.filter {
-                    it.anime_id != item.anime_id
-                }
-            }
-
-        })
-
-
-    val deleteAction3 = Action<Anime>(
-        text ="Archive",
-        iconRes = R.drawable.ic_archive,
-        backgroundColor = colorResource(R.color.color_action_6),
+        actionIconStyle = ActionIconStyle.Default.copy(
+            color = Color.White
+        ),
+        actionTextStyle = TextStyle().copy(
+            color = Color.White
+        ),
         onClicked = { item ->
-            if(item is Anime){
-                listItem = listItem.filter {
-                    it.anime_id != item.anime_id
-                }
-            }
-
-        })
-
-    val archiveAction1 = Action<Anime>(
-        text ="Archive",
-        iconRes = R.drawable.ic_archive,
-        backgroundColor = colorResource(R.color.color_action_1),
-        onClicked = { item ->
-            if(item is Anime){
-                listItem = listItem.filter {
-                    it.anime_id != item.anime_id
-                }
-            }
-
-        })
-
-    Icons.Default.Delete
-
-    val archiveAction2 = Action<Anime>(
-        text ="Archive",
-        iconRes = R.drawable.ic_archive,
-        backgroundColor = colorResource(R.color.color_action_2),
-        onClicked = { item ->
-            if(item is Anime){
-                listItem = listItem.filter {
-                    it.anime_id != item.anime_id
-                }
-            }
-
-
-        })
-
-    val archiveAction3 = Action<Anime>(
-        text ="Archive",
-        iconRes = R.drawable.ic_archive,
-        backgroundColor = colorResource(R.color.color_action_3),
-        onClicked = { item ->
-            if(item is Anime){
-                listItem = listItem.filter {
-                    it.anime_id != item.anime_id
-                }
-            }
-
+            //implement a function
+            Toast.makeText(context, "The end Delete action was clicked", Toast.LENGTH_SHORT).show()
         })
 
 
-    VerticalEasyList(
+    VerticalSwipableList(
         modifier = Modifier,
-        list = listItem,
+        list = list,
         onItemClicked = { item ->
 
         },
@@ -211,25 +227,122 @@ fun VerticalList(list: List<Anime>) {
         emptyView = { emptyView() },
         isLoading = isLoading,
         isRefreshing = isRefreshing,
-        onRefresh={
-                  isRefreshing = true
-            Handler(Looper.getMainLooper()).postDelayed({
-                isRefreshing = false
-            }, 2000)
+        startActions = listOf(startArchive, startDelete, startEdit),
+        endActions = listOf(endArchive, endDelete),
+        style = SwipableListStyle.Default.copy(
+            swipeBackgroundStyle = SwipeBackgroundStyle.Default.copy(color = Color.Blue)
+        ),
+        onRefresh = {
+            isRefreshing = true
         },
-        startActions = listOf(deleteAction1, deleteAction2, deleteAction3),
-        endActions = listOf(archiveAction1, archiveAction2, archiveAction3),
     )
+}
 
-    Handler(Looper.getMainLooper()).postDelayed({
-        isLoading = false
-    }, 2000)
+
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+fun VerticalSelectList(list: List<Anime>) {
+
+    val context = LocalContext.current
+    var isLoading by rememberSaveable { mutableStateOf(true) }
+    var isRefreshing by rememberSaveable { mutableStateOf(false) }
+    var isMultiSelectionMode by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = isLoading) {
+        if (isLoading) {
+            delay(2000)
+            isLoading = false
+        }
+    }
+
+    LaunchedEffect(key1 = isRefreshing) {
+        if (isRefreshing) {
+            delay(2000)
+            isRefreshing = false
+        }
+    }
+
+
+    val startArchive = MenuAction<Anime>(
+        text = "Archive",
+        iconRes = R.drawable.ic_archive,
+        onClicked = { items ->
+            //implement a function
+            isMultiSelectionMode = false
+            Toast.makeText(context, "The start Archive action was clicked", Toast.LENGTH_SHORT)
+                .show()
+        })
+
+
+    val startDelete = MenuAction<Anime>(
+        text = "Delete",
+        iconRes = R.drawable.ic_delete,
+        onClicked = { items ->
+            //implement a function
+            isMultiSelectionMode = false
+            Toast.makeText(context, "The start Delete action was clicked", Toast.LENGTH_SHORT)
+                .show()
+        })
+
+
+    val startEdit = MenuAction<Anime>(
+        text = "Edit",
+        iconRes = R.drawable.ic_edit,
+        onClicked = { items ->
+            //implement a function
+            isMultiSelectionMode = false
+            Toast.makeText(context, "The start Edit action was clicked", Toast.LENGTH_SHORT).show()
+        })
+
+
+    VerticalSelectableList(
+        modifier = Modifier,
+        list = list,
+        onItemClicked = { item, p ->
+            if (isMultiSelectionMode) {
+                //handle adding an item to list
+            }
+        },
+        onItemLongClicked = { item, po ->
+            isMultiSelectionMode = !isMultiSelectionMode
+            if(isMultiSelectionMode){
+
+            }
+        },
+        view = { AnimeCard(anime = it) },
+        emptyView = { emptyView() },
+        isMultiSelectionMode = isMultiSelectionMode,
+        isLoading = isLoading,
+        isRefreshing = isRefreshing,
+        actions = listOf(startArchive, startDelete, startEdit),
+        style = SelectableListStyle.Default.copy(
+            enabledActionTextStyle = TextStyle().copy(
+                textAlign = TextAlign.Center,
+                color = Color.Magenta
+            ),
+            enabledActionIconStyle = ActionIconStyle.Default.copy(
+                color = Color.Magenta
+            )
+        ),
+        onRefresh = {
+            isRefreshing = true
+        },
+    )
 }
 
 @Composable
 fun HorizontalList(list: List<Anime>) {
     val listItem by remember { mutableStateOf(list) }
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by rememberSaveable { mutableStateOf(true) }
+
+    LaunchedEffect(key1 = isLoading) {
+        if (isLoading) {
+            delay(1000)
+            isLoading = false
+        }
+    }
+
     HorizontalEasyList(
         list = listItem,
         view = { AnimeCard(anime = it) },
@@ -241,11 +354,6 @@ fun HorizontalList(list: List<Anime>) {
 
         }
     )
-
-    Handler(Looper.getMainLooper()).postDelayed({
-        isLoading = false
-    }, 1000)
-
 }
 
 
@@ -253,23 +361,26 @@ fun HorizontalList(list: List<Anime>) {
 @Composable
 fun GridList(list: List<Anime>) {
     val listItem by remember { mutableStateOf(list) }
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by rememberSaveable { mutableStateOf(true) }
+
+    LaunchedEffect(key1 = isLoading) {
+        if (isLoading) {
+            delay(1000)
+            isLoading = false
+        }
+    }
 
     GridEasyList(
         list = listItem,
         view = { AnimeGridCard(anime = it) },
         emptyView = { emptyView() },
         isLoading = isLoading,
-        columnCount = 2,
+        columnCount = 3,
         scrollTo = 0,
-        onItemClicked = {item,position->
+        onItemClicked = { item, position ->
 
         },
 
 
-    )
-
-    Handler(Looper.getMainLooper()).postDelayed({
-        isLoading = false
-    }, 1000)
+        )
 }

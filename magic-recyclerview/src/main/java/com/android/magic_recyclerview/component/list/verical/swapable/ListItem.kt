@@ -1,22 +1,25 @@
 package com.android.magic_recyclerview.component.list.verical.swapable
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.android.magic_recyclerview.component.action_row.ActionRowType
 import com.android.magic_recyclerview.component.action_row.ActionsRow
 import com.android.magic_recyclerview.component.swippable_item.SwappableItem
-import com.android.magic_recyclerview.model.Action
+import com.android.magic_recyclerview.model.SelectableListStyle
+import com.android.magic_recyclerview.model.SwipableAction
+import com.android.magic_recyclerview.model.SwipableListStyle
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -25,17 +28,23 @@ internal fun <T> ListItem(
     isLast: Boolean,
     view: @Composable () -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
-    startActions: List<Action<T>> = listOf(),
-    endActions: List<Action<T>> = listOf(),
+    startActions: List<SwipableAction<T>> = listOf(),
+    endActions: List<SwipableAction<T>> = listOf(),
+    style: SwipableListStyle = SwipableListStyle.Default,
     onItemClicked: (item: T) -> Unit,
     onItemDoubleClicked: (item: T) -> Unit,
-    onItemCollapsed: ((item: T) -> Unit)? = null,
-    onItemExpanded: ((item: T) -> Unit)? = null,
-    actionBackgroundRadiusCorner: Float = 0f,
 ) {
 
-    val isActionClicked = rememberSaveable { mutableStateOf(false) }
+    var isActionClicked by rememberSaveable { mutableStateOf(false) }
     val isRTL = LocalLayoutDirection.current == LayoutDirection.Rtl
+
+    LaunchedEffect(key1 = isActionClicked) {
+        if(isActionClicked){
+            delay(1000)
+            isActionClicked = false
+        }
+
+    }
 
 
     ConstraintLayout {
@@ -53,25 +62,19 @@ internal fun <T> ListItem(
             ActionsRow(
                 modifier = Modifier.weight(1f),
                 item = item,
-                radiusCorner = actionBackgroundRadiusCorner,
+                style = style,
                 actions = startActions,
                 isActionClicked = {
-                    isActionClicked.value = true
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        isActionClicked.value = false
-                    }, 1000)
+                    isActionClicked = true
                 }
             )
             ActionsRow(
                 modifier = Modifier.weight(1f),
                 item = item,
-                radiusCorner = actionBackgroundRadiusCorner,
+                style = style,
                 actions = endActions,
                 isActionClicked = {
-                    isActionClicked.value = true
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        isActionClicked.value = false
-                    }, 1000)
+                    isActionClicked = true
                 }
             )
 
@@ -87,13 +90,13 @@ internal fun <T> ListItem(
             },
             item = item,
             mainItem = { view() },
-            isActionClicked = isActionClicked.value,
-            onCollapsed = { item -> onItemCollapsed?.invoke(item) },
-            onExpanded = { type, item -> onItemExpanded?.invoke(item) },
+            isActionClicked = isActionClicked,
+            onCollapsed = {},
+            onExpanded = {},
             enableLTRSwipe = if (isRTL) endActions.isNotEmpty() else startActions.isNotEmpty(),
             enableRTLSwipe = if (isRTL) startActions.isNotEmpty() else endActions.isNotEmpty(),
-            onItemClicked = { onItemClicked(it) },
-            onItemDoubleClicked = { onItemDoubleClicked(it) }
+            onItemClicked = onItemClicked,
+            onItemDoubleClicked = onItemDoubleClicked
         )
 
         if (!isLast && dividerView != null) {

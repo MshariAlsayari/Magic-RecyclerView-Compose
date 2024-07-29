@@ -18,23 +18,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.android.magic_recyclerview.model.Action
+import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableListStyle
 import com.android.magic_recyclerview.model.getIcon
 import com.android.magic_recyclerview.model.getText
 
 
 @Composable
-fun <T> DropdownMenu(
+internal fun <T> DropdownMenu(
     modifier: Modifier = Modifier,
     selectedItem: List<T> = listOf(),
-    itemDropdowns: List<Action<T>> = listOf(),
+    itemDropdowns: List<MenuAction<T>> = listOf(),
+    style: SelectableListStyle = SelectableListStyle.Default,
     state: Boolean,
     onDismiss: () -> Unit,
-    onActionClicked: (selectedItem: List<T>, action: Action<T>) -> Unit,
+    onActionClicked: (selectedItem: List<T>, action: MenuAction<T>) -> Unit,
 ) {
 
     val isArabicLanguage = LocalLayoutDirection.current == LayoutDirection.Rtl
     val textAlign = if (isArabicLanguage) TextAlign.Right else TextAlign.Left
+
 
     val direction =
         if (isArabicLanguage) {
@@ -54,6 +57,17 @@ fun <T> DropdownMenu(
                 offset = DpOffset(10.dp, 5.dp),
             ) {
                 itemDropdowns.forEach { action ->
+                    val iconStyle = if(action.clickable){
+                        style.enabledActionIconStyle
+                    }else{
+                        style.disabledActionIconStyle
+                    }
+
+                    val textStyle = if (action.clickable) {
+                        style.enabledActionTextStyle
+                    } else {
+                        style.enabledActionTextStyle
+                    }
                     val text = action.getText()
                     val icon = action.getIcon()
                     DropdownMenuItem(
@@ -61,6 +75,8 @@ fun <T> DropdownMenu(
                             if (icon != null) {
                                 if (icon is Int) {
                                     Icon(
+                                        modifier = Modifier.size(iconStyle.size),
+                                        tint = iconStyle.color,
                                         painter = painterResource(id = icon),
                                         contentDescription = null
                                     )
@@ -68,6 +84,8 @@ fun <T> DropdownMenu(
 
                                 if (icon is ImageVector) {
                                     Icon(
+                                        modifier = Modifier.size(iconStyle.size),
+                                        tint = iconStyle.color,
                                         imageVector = icon,
                                         contentDescription = null
                                     )
@@ -77,8 +95,7 @@ fun <T> DropdownMenu(
                             if (text != null) {
                                 Text(
                                     text = text,
-                                    style = MaterialTheme.typography.button,
-                                    color = Color.White,
+                                    style = textStyle.copy(textAlign = textAlign),
                                     textAlign = textAlign
                                 )
                             }

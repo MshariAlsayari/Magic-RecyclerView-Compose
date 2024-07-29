@@ -12,11 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import com.android.magic_recyclerview.SelectableItemBase
-import com.android.magic_recyclerview.component.action_row.ActionRowType
 import com.android.magic_recyclerview.component.magic_recyclerview.EmptyView
 import com.android.magic_recyclerview.component.magic_recyclerview.LoadingView
 import com.android.magic_recyclerview.component.magic_recyclerview.UnSelectableItem
-import com.android.magic_recyclerview.model.Action
+import com.android.magic_recyclerview.model.SelectableListStyle
+import com.android.magic_recyclerview.model.SwipableAction
+import com.android.magic_recyclerview.model.SwipableListStyle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -49,7 +50,7 @@ import kotlinx.coroutines.launch
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun <T> VerticalEasyList(
+fun <T> VerticalSwipableList(
     modifier: Modifier = Modifier,
     list: List<T>,
     view: @Composable (T) -> Unit,
@@ -58,11 +59,9 @@ fun <T> VerticalEasyList(
     loadingProgress: (@Composable () -> Unit)? = null,
     onItemClicked: (item: T) -> Unit,
     onItemDoubleClicked: (item: T) -> Unit,
-    onItemCollapsed: ((item: T) -> Unit)? = null,
-    onItemExpanded: ((item: T) -> Unit)? = null,
-    startActions: List<Action<T>> = listOf(),
-    endActions: List<Action<T>> = listOf(),
-    actionBackgroundRadiusCorner: Float = 0f,
+    startActions: List<SwipableAction<T>> = listOf(),
+    endActions: List<SwipableAction<T>> = listOf(),
+    style: SwipableListStyle = SwipableListStyle.Default,
     isLoading: Boolean = false,
     isRefreshing: Boolean = false,
     onRefresh: (() -> Unit)? = null,
@@ -101,9 +100,7 @@ fun <T> VerticalEasyList(
                         endActions = endActions,
                         onItemClicked = onItemClicked,
                         onItemDoubleClicked = onItemDoubleClicked,
-                        onItemCollapsed = onItemCollapsed,
-                        onItemExpanded = onItemExpanded,
-                        actionBackgroundRadiusCorner = actionBackgroundRadiusCorner,
+                        style = style,
                         scrollTo = scrollTo,
                     )
                 } else {
@@ -122,17 +119,15 @@ fun <T> VerticalEasyList(
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun <T> LazyList(
+private fun <T> LazyList(
     list: List<T>,
     view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
-    startActions: List<Action<T>> = listOf(),
-    endActions: List<Action<T>> = listOf(),
+    startActions: List<SwipableAction<T>> = listOf(),
+    endActions: List<SwipableAction<T>> = listOf(),
     onItemClicked: (item: T) -> Unit,
     onItemDoubleClicked: (item: T) -> Unit,
-    onItemCollapsed: ((item: T) -> Unit)? = null,
-    onItemExpanded: ((item: T) -> Unit)? = null,
-    actionBackgroundRadiusCorner: Float = 0f,
+    style: SwipableListStyle = SwipableListStyle.Default,
     scrollTo: Int = 0,
 ) {
 
@@ -152,11 +147,9 @@ fun <T> LazyList(
                     dividerView = dividerView,
                     startActions = startActions,
                     endActions = endActions,
-                    actionBackgroundRadiusCorner = actionBackgroundRadiusCorner,
+                    style = style,
                     onItemClicked = onItemClicked,
                     onItemDoubleClicked = onItemDoubleClicked,
-                    onItemCollapsed = onItemCollapsed,
-                    onItemExpanded = onItemExpanded
                 )
             } else {
                 UnSelectableItem(view = view, item = item)

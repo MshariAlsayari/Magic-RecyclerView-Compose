@@ -1,31 +1,21 @@
 package com.android.magic_recyclerview.component.list.verical.swapable
 
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.android.magic_recyclerview.SelectableItemBase
-import com.android.magic_recyclerview.component.action_row.ActionRowType
-import com.android.magic_recyclerview.component.action_row.ActionsRow
 import com.android.magic_recyclerview.component.magic_recyclerview.EmptyView
 import com.android.magic_recyclerview.component.magic_recyclerview.LoadingView
 import com.android.magic_recyclerview.component.magic_recyclerview.UnSelectableItem
-import com.android.magic_recyclerview.component.swippable_item.SwappableItem
-import com.android.magic_recyclerview.model.Action
+import com.android.magic_recyclerview.model.SwipableAction
+import com.android.magic_recyclerview.model.SwipableListStyle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
@@ -58,24 +48,22 @@ import kotlinx.coroutines.launch
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun <T: SelectableItemBase> VerticalEasyPagedList(
-    modifier                    : Modifier = Modifier,
-    list                        : LazyPagingItems<T>?,
-    view                        : @Composable (T) -> Unit,
-    dividerView                 : (@Composable () -> Unit)? = null,
-    emptyView                   : (@Composable () -> Unit)? = null,
-    loadingProgress             : (@Composable () -> Unit)? = null,
-    onItemClicked               : (item: T) -> Unit,
-    onItemDoubleClicked         : (item: T) -> Unit,
-    onItemCollapsed             : ((item: T) -> Unit)? = null,
-    onItemExpanded              : ((item: T) -> Unit)? = null,
-    startActions                : List<Action<T>> = listOf(),
-    endActions                  : List<Action<T>> = listOf(),
-    actionBackgroundRadiusCorner: Float = 0f,
-    isLoading                   : Boolean = false,
-    isRefreshing                : Boolean = false,
-    onRefresh                   : (() -> Unit)? = null,
-    scrollTo                    : Int = 0,
+fun <T : SelectableItemBase> VerticalSwipablePagedList(
+    modifier: Modifier = Modifier,
+    list: LazyPagingItems<T>?,
+    view: @Composable (T) -> Unit,
+    dividerView: (@Composable () -> Unit)? = null,
+    emptyView: (@Composable () -> Unit)? = null,
+    loadingProgress: (@Composable () -> Unit)? = null,
+    onItemClicked: (item: T) -> Unit,
+    onItemDoubleClicked: (item: T) -> Unit,
+    startActions: List<SwipableAction<T>> = listOf(),
+    endActions: List<SwipableAction<T>> = listOf(),
+    isLoading: Boolean = false,
+    isRefreshing: Boolean = false,
+    style: SwipableListStyle = SwipableListStyle.Default,
+    onRefresh: (() -> Unit)? = null,
+    scrollTo: Int = 0,
 ) {
 
     if (startActions.size > 3) {
@@ -100,20 +88,18 @@ fun <T: SelectableItemBase> VerticalEasyPagedList(
 
             if (isLoading)
                 LoadingView(loadingProgress)
-            else{
+            else {
                 if (list != null && list.itemCount > 0) {
                     LazyPagedList(
-                        list                        = list,
-                        view                        = view,
-                        dividerView                 = dividerView,
-                        startActions                = startActions,
-                        endActions                  = endActions,
-                        onItemClicked               = onItemClicked,
-                        onItemDoubleClicked         = onItemDoubleClicked,
-                        onItemCollapsed             = onItemCollapsed,
-                        onItemExpanded              = onItemExpanded,
-                        actionBackgroundRadiusCorner= actionBackgroundRadiusCorner,
-                        scrollTo                    = scrollTo,
+                        list = list,
+                        view = view,
+                        dividerView = dividerView,
+                        startActions = startActions,
+                        endActions = endActions,
+                        onItemClicked = onItemClicked,
+                        onItemDoubleClicked = onItemDoubleClicked,
+                        style = style,
+                        scrollTo = scrollTo,
                     )
                 } else {
                     EmptyView(emptyView)
@@ -125,30 +111,27 @@ fun <T: SelectableItemBase> VerticalEasyPagedList(
     }
 
 
-
 }
-
 
 
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun <T:SelectableItemBase>LazyPagedList(
-    list                        : LazyPagingItems<T>,
-    view                        : @Composable (T) -> Unit,
-    dividerView                 : (@Composable () -> Unit)? = null,
-    startActions                : List<Action<T>> = listOf(),
-    endActions                  : List<Action<T>> = listOf(),
-    onItemClicked               : (item: T) -> Unit,
-    onItemDoubleClicked         : (item: T) -> Unit,
-    onItemCollapsed             : ((item: T) -> Unit)? = null,
-    onItemExpanded              : ((item: T) -> Unit)? = null,
-    actionBackgroundRadiusCorner: Float = 0f,
-    scrollTo                    : Int = 0,){
+private fun <T : SelectableItemBase> LazyPagedList(
+    list: LazyPagingItems<T>,
+    view: @Composable (T) -> Unit,
+    dividerView: (@Composable () -> Unit)? = null,
+    startActions: List<SwipableAction<T>> = listOf(),
+    endActions: List<SwipableAction<T>> = listOf(),
+    style: SwipableListStyle = SwipableListStyle.Default,
+    onItemClicked: (item: T) -> Unit,
+    onItemDoubleClicked: (item: T) -> Unit,
+    scrollTo: Int = 0,
+) {
 
 
-    val listState       = rememberLazyListState()
-    val coroutineScope  = rememberCoroutineScope()
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     LazyColumn(
         state = listState
@@ -157,11 +140,11 @@ fun <T:SelectableItemBase>LazyPagedList(
             key = list.itemKey { it.id },
             contentType = {
                 if (list[it] is SelectableItemBase) "selectableItem" else "unSelectableItem"
-            }) {  index  ->
+            }) { index ->
             val item = list[index]
             item?.let {
 
-                if((item as SelectableItemBase).isSelectable){
+                if ((item as SelectableItemBase).isSelectable) {
                     ListItem(
                         item = item,
                         isLast = index == list.itemCount,
@@ -169,14 +152,12 @@ fun <T:SelectableItemBase>LazyPagedList(
                         dividerView = dividerView,
                         startActions = startActions,
                         endActions = endActions,
-                        actionBackgroundRadiusCorner = actionBackgroundRadiusCorner,
+                        style = style,
                         onItemClicked = onItemClicked,
                         onItemDoubleClicked = onItemDoubleClicked,
-                        onItemCollapsed = onItemCollapsed,
-                        onItemExpanded = onItemExpanded
                     )
 
-                }else{
+                } else {
                     UnSelectableItem(view = view, item = item)
                 }
 

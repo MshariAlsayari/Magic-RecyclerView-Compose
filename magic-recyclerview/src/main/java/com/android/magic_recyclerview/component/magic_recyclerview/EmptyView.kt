@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun EmptyView(view: (@Composable () -> Unit)? = null) {
+internal fun EmptyView(view: (@Composable () -> Unit)? = null) {
     Box(
         modifier = Modifier
             .fillMaxSize()

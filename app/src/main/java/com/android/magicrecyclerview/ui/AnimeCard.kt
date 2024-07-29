@@ -56,19 +56,15 @@ fun AnimeCard(anime: Anime) {
 fun AnimeGridCard(anime: Anime) {
     Card(
         modifier= Modifier.size(200.dp),
-        backgroundColor = Color.White,
+        backgroundColor = Color.Black,
         shape = RoundedCornerShape(0.dp),
     ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-
-            Image(
-                painter = rememberImagePainter(anime.anime_img),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-            )
-
-
-        }
+        Image(
+            painter = rememberImagePainter(anime.anime_img),
+            contentDescription = null,
+            contentScale = ContentScale.FillBounds,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 

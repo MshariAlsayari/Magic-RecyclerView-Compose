@@ -1,7 +1,5 @@
 package com.android.magic_recyclerview.component.action_row
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -9,24 +7,31 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.android.magic_recyclerview.Constants
-import com.android.magic_recyclerview.model.Action
+import com.android.magic_recyclerview.model.SelectableListStyle
+import com.android.magic_recyclerview.model.SwipableAction
+import com.android.magic_recyclerview.model.SwipableListStyle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun <T> ActionsRow(
     modifier: Modifier,
     item: T,
-    actions: List<Action<T>>,
-    radiusCorner: Float = 0f,
-    isActionClicked: (() -> Unit)? = null
+    actions: List<SwipableAction<T>>,
+    style: SwipableListStyle = SwipableListStyle.Default,
+    isActionClicked: (() -> Unit) = {}
 ) {
+
+    val coroutine = rememberCoroutineScope()
 
     Card(
         modifier = modifier.fillMaxHeight(),
-        shape = RoundedCornerShape(radiusCorner.dp),
+        backgroundColor = style.swipeBackgroundStyle.color,
+        shape = RoundedCornerShape(style.swipeBackgroundStyle.radiusCorner),
     ) {
 
         Row(
@@ -38,21 +43,18 @@ fun <T> ActionsRow(
                     modifier = Modifier
                         .weight(1f)
                         .background(it.backgroundColor)
-                        .fillMaxHeight()
-                        .size(it.actionSize),
+                        .fillMaxHeight(),
                     action = it,
                     onClicked = { item ->
-                        isActionClicked?.invoke()
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            it.onClicked?.invoke(item as Any)
-                        }, Constants.SWIPE_ANIMATION_DURATION.toLong())
-
-
-                },
-                item = item)
+                        isActionClicked()
+                        coroutine.launch {
+                            delay(Constants.SWIPE_ANIMATION_DURATION.toLong())
+                            it.onClicked(item)
+                        }
+                    },
+                    item = item
+                )
             }
-
-
         }
 
     }

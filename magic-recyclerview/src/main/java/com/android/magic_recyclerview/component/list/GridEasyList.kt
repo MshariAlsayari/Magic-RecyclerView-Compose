@@ -18,9 +18,6 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
 
-
-
-
 /***
  * modifier - the modifier to apply to this layout.
  * list -  list of data.
@@ -47,40 +44,37 @@ fun <T> GridEasyList(
     onRefresh: (() -> Unit)? = null,
     isLoading: Boolean = false,
     loadingProgress: (@Composable () -> Unit)? = null,
-    onItemClicked               : (item: T, position: Int) -> Unit,
+    onItemClicked: (item: T, position: Int) -> Unit,
     scrollTo: Int = 0,
 ) {
 
 
-            SwipeRefresh(
-                state = rememberSwipeRefreshState(isRefreshing),
-                swipeEnabled = onRefresh != null,
-                onRefresh = { onRefresh?.invoke() },
-            ) {
-                Box(contentAlignment = Alignment.Center) {
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        swipeEnabled = onRefresh != null,
+        onRefresh = { onRefresh?.invoke() },
+    ) {
+        Box(contentAlignment = Alignment.Center) {
 
-                    if (isLoading)
-                        LoadingView(loadingProgress)
-                    else{
-                        if (list.isNotEmpty()){
-                            LazyGridList(
-                                modifier = modifier,
-                                list = list,
-                                view = view,
-                                columnCount = columnCount,
-                                onItemClicked = onItemClicked,
-                                scrollTo = scrollTo
-                            )
+            if (isLoading)
+                LoadingView(loadingProgress)
+            else {
+                if (list.isNotEmpty()) {
+                    LazyGridList(
+                        modifier = modifier,
+                        list = list,
+                        view = view,
+                        columnCount = columnCount,
+                        onItemClicked = onItemClicked,
+                        scrollTo = scrollTo
+                    )
 
-                        }else
-                            EmptyView(emptyView)
-                    }
-                }
-
+                } else
+                    EmptyView(emptyView)
             }
+        }
 
-
-
+    }
 
 
 }
@@ -103,23 +97,14 @@ fun <T> LazyGridList(
         columns = GridCells.Fixed(columnCount),
     ) {
         itemsIndexed(list) { index, item ->
-            Column(
-                modifier = modifier,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            Box(
+                modifier = modifier.clickable {
+                    onItemClicked(item, index)
+                },
+                contentAlignment = Alignment.Center,
             ) {
-                Box(
-                    modifier = modifier.clickable {
-                        onItemClicked(item, index)
-                    },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    view(item)
-                }
-
+                view(item)
             }
-
-
         }
 
         coroutineScope.launch {

@@ -20,43 +20,46 @@ import androidx.compose.ui.unit.dp
 import com.android.magic_recyclerview.R
 import com.android.magic_recyclerview.component.action_row.MenuActionItem
 import com.android.magic_recyclerview.component.magic_recyclerview.DropdownMenu
-import com.android.magic_recyclerview.model.Action
+import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableListStyle
 
 @Composable
-fun <T> ActionContainer(
+internal fun <T> ActionContainer(
     modifier: Modifier = Modifier,
     selectedItem: List<T> = listOf(),
-    actions: List<Action<T>>,
+    actions: List<MenuAction<T>>,
+    style: SelectableListStyle = SelectableListStyle.Default,
 ) {
 
     var moreActionsExtended by rememberSaveable { mutableStateOf(false) }
 
-    val bottomActions = mutableListOf<Action<T>>()
-    val moreActions = mutableListOf<Action<T>>()
+    val bottomActions = mutableListOf<MenuAction<T>>()
+    val moreActions = mutableListOf<MenuAction<T>>()
+    val visibleActions = actions.filter { it.visible }
 
-    val moreAction = Action<T>(
+    val moreAction = MenuAction<T>(
         clickable = true,
         iconRes = R.drawable.ic_more,
-        onClicked = { items ->
+        onClicked = { _->
             moreActionsExtended = !moreActionsExtended
         })
 
-    if (actions.size > 3) {
-        moreActions.addAll(actions.slice(3 until actions.size))
-        bottomActions.addAll(actions.slice(0 until 3))
+    if (visibleActions.filter { it.visible }.size > 3) {
+        moreActions.addAll(visibleActions.slice(3 until visibleActions.size))
+        bottomActions.addAll(visibleActions.slice(0 until 3))
         bottomActions.add(moreAction)
     } else {
-        bottomActions.addAll(actions)
+        bottomActions.addAll(visibleActions)
     }
 
 
     Card(
-        elevation = 4.dp,
-        shape = RoundedCornerShape(20.dp),
+        elevation = style.menuActionsContainerStyle.elevation,
+        shape = RoundedCornerShape(style.menuActionsContainerStyle.radiusCorner),
         modifier = modifier
             .padding(18.dp)
             .fillMaxWidth()
-            .height(85.dp)
+            .height(style.menuActionsContainerStyle.height)
     ) {
         Row(
             modifier.fillMaxSize(),
@@ -68,9 +71,10 @@ fun <T> ActionContainer(
                 MenuActionItem(
                     modifier = Modifier.fillMaxHeight(),
                     action = action,
+                    style = style,
                     items = selectedItem,
                     onClicked = { items ->
-                        action.onClicked?.let { it1 -> it1(items) }
+                        action.onClicked(items)
                     })
             }
 
@@ -81,10 +85,11 @@ fun <T> ActionContainer(
     DropdownMenu(
         itemDropdowns = moreActions,
         selectedItem = selectedItem,
+        style = style,
         state = moreActionsExtended,
         onDismiss = { moreActionsExtended = false },
-        onActionClicked = { selectedItems, actionClicked ->
-            actionClicked.onClicked?.let { it1 -> it1(selectedItems) }
+        onActionClicked = { selectedItems,actionClicked ->
+            actionClicked.onClicked(selectedItems)
         },
     )
 }

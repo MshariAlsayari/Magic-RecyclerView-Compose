@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import com.android.magic_recyclerview.SelectableItemBase
 
 @Composable
-fun <T> UnSelectableItem(
+internal fun <T> UnSelectableItem(
     view: @Composable (T) -> Unit,
     item: T) {
     view(item)

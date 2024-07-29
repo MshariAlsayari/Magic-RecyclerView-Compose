@@ -19,17 +19,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.android.magic_recyclerview.model.SelectableListStyle
 
 @Composable
-fun Selection(backgroundColor: Color, isSelected: Boolean) {
+internal fun Selection(
+    style: SelectableListStyle = SelectableListStyle.Default,
+    isSelected: Boolean
+) {
+
+    val background = if(isSelected){
+        style.selectedSelectionStyle.selectionBackground
+    }else{
+        style.unselectedSelectionStyle.selectionBackground
+    }
+
+
 
     Box(
         modifier = Modifier
             .size(24.dp)
             .clip(CircleShape)
-            .background(backgroundColor)
+            .background(background)
             .border(1.dp, Color.LightGray, CircleShape)
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 16.dp)
     ) {
         AnimatedVisibility(
             visible = isSelected,
@@ -37,9 +49,9 @@ fun Selection(backgroundColor: Color, isSelected: Boolean) {
             exit = scaleOut(),
         ) {
             Icon(
-                Icons.Default.Check,
+                style.selectedSelectionStyle.checkIcon,
                 contentDescription = null,
-                tint = MaterialTheme.colors.onBackground
+                tint = style.selectedSelectionStyle.iconColor
             )
         }
     }

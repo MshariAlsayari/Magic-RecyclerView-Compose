@@ -46,8 +46,14 @@ internal fun <T> DropdownMenu(
             LayoutDirection.Rtl
         }
 
+    val menuItemDirection =if (isArabicLanguage) {
+        LayoutDirection.Rtl
+    } else {
+        LayoutDirection.Ltr
+    }
+
     CompositionLocalProvider(LocalLayoutDirection provides direction) {
-        MaterialTheme(shapes = MaterialTheme.shapes.copy(medium = RoundedCornerShape(16.dp))) {
+        MaterialTheme(shapes = MaterialTheme.shapes.copy(medium = RoundedCornerShape(style.menuActionsContainerStyle.radiusCorner))) {
             DropdownMenu(
                 expanded = state,
                 onDismissRequest = { onDismiss() },
@@ -66,45 +72,49 @@ internal fun <T> DropdownMenu(
                     val textStyle = if (action.clickable) {
                         style.enabledActionTextStyle
                     } else {
-                        style.enabledActionTextStyle
+                        style.disabledActionTextStyle
                     }
                     val text = action.getText()
                     val icon = action.getIcon()
-                    DropdownMenuItem(
-                        content = {
-                            if (icon != null) {
-                                if (icon is Int) {
-                                    Icon(
-                                        modifier = Modifier.size(iconStyle.size),
-                                        tint = iconStyle.color,
-                                        painter = painterResource(id = icon),
-                                        contentDescription = null
-                                    )
+                    CompositionLocalProvider(LocalLayoutDirection provides menuItemDirection) {
+                        DropdownMenuItem(
+                            enabled = action.clickable,
+                            content = {
+                                if (icon != null) {
+                                    if (icon is Int) {
+                                        Icon(
+                                            modifier = Modifier.size(iconStyle.size).padding(end = 5.dp),
+                                            tint = iconStyle.color,
+                                            painter = painterResource(id = icon),
+                                            contentDescription = null
+                                        )
+                                    }
+
+                                    if (icon is ImageVector) {
+                                        Icon(
+                                            modifier = Modifier.size(iconStyle.size).padding(end = 5.dp),
+                                            tint = iconStyle.color,
+                                            imageVector = icon,
+                                            contentDescription = null
+                                        )
+                                    }
                                 }
 
-                                if (icon is ImageVector) {
-                                    Icon(
-                                        modifier = Modifier.size(iconStyle.size),
-                                        tint = iconStyle.color,
-                                        imageVector = icon,
-                                        contentDescription = null
+                                if (text != null) {
+                                    Text(
+                                        text = text,
+                                        style = textStyle.copy(textAlign = textAlign),
+                                        textAlign = textAlign
                                     )
                                 }
-                            }
-
-                            if (text != null) {
-                                Text(
-                                    text = text,
-                                    style = textStyle.copy(textAlign = textAlign),
-                                    textAlign = textAlign
-                                )
-                            }
-                        },
-                        onClick = {
-                            if (action.clickable)
+                            },
+                            onClick = {
                                 onActionClicked(selectedItem, action).run { onDismiss() }
-                        }
-                    )
+                            }
+                        )
+
+                    }
+
 
 
                 }

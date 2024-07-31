@@ -302,6 +302,7 @@ fun VerticalSelectList(list: List<Anime>) {
     val startEdit = MenuAction<Anime>(
         text = "Edit",
         iconRes = R.drawable.ic_edit,
+        clickable = false,
         onClicked = { items ->
             //implement a function
             reset()

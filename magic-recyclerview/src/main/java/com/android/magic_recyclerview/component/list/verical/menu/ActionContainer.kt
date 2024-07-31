@@ -24,6 +24,7 @@ import com.android.magic_recyclerview.component.action_row.MenuActionItem
 import com.android.magic_recyclerview.component.magic_recyclerview.DropdownMenu
 import com.android.magic_recyclerview.model.MenuAction
 import com.android.magic_recyclerview.model.SelectableListStyle
+import com.android.magic_recyclerview.model.getText
 
 @Composable
 internal fun <T> ActionContainer(
@@ -42,6 +43,7 @@ internal fun <T> ActionContainer(
     val moreAction = MenuAction<T>(
         clickable = true,
         iconRes = R.drawable.ic_more,
+        textRes = if(visibleActions.first().getText() != null) R.string.more else null,
         onClicked = { _->
             moreActionsExtended = !moreActionsExtended
         })

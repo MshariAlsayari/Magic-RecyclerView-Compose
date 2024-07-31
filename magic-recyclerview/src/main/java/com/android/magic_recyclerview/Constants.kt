@@ -1,5 +1,6 @@
 package com.android.magic_recyclerview
 
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.unit.dp
 
 
@@ -20,5 +21,7 @@ internal object Constants {
     val RADIUS_CORNER = 20.dp
     val ELEVATION = 4.dp
     val HEIGHT = 85.dp
-    val SELECTION_SIZE = 24.dp
+    val SELECTION_SHAPE= CircleShape
+    val SELECTION_SIZE = 32.dp
+    val BORDER_WIDTH = 1.dp
 }

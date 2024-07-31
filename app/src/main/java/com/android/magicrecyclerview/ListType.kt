@@ -1,5 +1,8 @@
 package com.android.magicrecyclerview
 
-enum class ListType {
-    VERTICAL_SWIPE, VERTICAL_SELECT, HORIZONTAL, GRID
+enum class ListType(val index: Int) {
+    VERTICAL_SWIPE(0),
+    VERTICAL_SELECT(1),
+    HORIZONTAL(2),
+    GRID(3)
 }

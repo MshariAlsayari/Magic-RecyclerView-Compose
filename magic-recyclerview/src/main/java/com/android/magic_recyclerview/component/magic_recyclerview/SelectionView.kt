@@ -15,9 +15,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.android.magic_recyclerview.model.SelectableListStyle
 
@@ -27,21 +29,30 @@ internal fun Selection(
     isSelected: Boolean
 ) {
 
-    val background = if(isSelected){
-        style.selectedSelectionStyle.selectionBackground
+
+    val selectionStyle = if(isSelected){
+        style.selectedSelectionStyle
     }else{
-        style.unselectedSelectionStyle.selectionBackground
+        style.unselectedSelectionStyle
     }
+
+    val shape = selectionStyle.shape
+    val size = selectionStyle.size
+    val background = selectionStyle.selectionBackground
+    val icon = selectionStyle.checkIcon
+    val iconColor = selectionStyle.iconColor
+    val borderColor = selectionStyle.borderColor
+    val borderWidth = selectionStyle.borderWidth
 
 
 
     Box(
         modifier = Modifier
-            .size(24.dp)
-            .clip(CircleShape)
+            .size(size)
+            .clip(shape)
             .background(background)
-            .border(1.dp, Color.LightGray, CircleShape)
-            .padding(horizontal = 16.dp)
+            .border(borderWidth, borderColor, shape),
+        contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
             visible = isSelected,
@@ -49,9 +60,9 @@ internal fun Selection(
             exit = scaleOut(),
         ) {
             Icon(
-                style.selectedSelectionStyle.checkIcon,
+                icon,
+                tint = iconColor,
                 contentDescription = null,
-                tint = style.selectedSelectionStyle.iconColor
             )
         }
     }

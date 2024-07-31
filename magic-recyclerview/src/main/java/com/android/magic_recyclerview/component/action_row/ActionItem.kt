@@ -1,5 +1,6 @@
 package com.android.magic_recyclerview.component.action_row
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -7,6 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -96,11 +98,12 @@ fun <T> MenuActionItem(
     val textStyle = if (action.clickable) {
         style.enabledActionTextStyle
     } else {
-        style.enabledActionTextStyle
+        style.disabledActionTextStyle
     }
 
     IconButton(
         modifier = modifier,
+        enabled = action.clickable,
         onClick = {
             onClicked(items)
         },

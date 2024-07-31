@@ -27,6 +27,7 @@ internal fun <T> SelectableListItem(
     style: SelectableListStyle = SelectableListStyle.Default,
     isLastItem:Boolean,
     isMultiSelectionMode: Boolean = false,
+    isSelected: Boolean = false,
 ){
     val startPadding = if (isMultiSelectionMode) 16.dp else 0.dp
 
@@ -35,8 +36,7 @@ internal fun <T> SelectableListItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row (
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ){
             AnimatedVisibility(
@@ -46,7 +46,7 @@ internal fun <T> SelectableListItem(
                 exit = scaleOut(),
             ) {
                 if(selectedSelectionView!= null  && unselectedSelectionView != null){
-                    if((item as SelectableItemBase).isSelected){
+                    if(isSelected){
                         selectedSelectionView()
                     }else{
                         unselectedSelectionView()
@@ -54,7 +54,7 @@ internal fun <T> SelectableListItem(
                 }else{
                     Selection(
                         style = style,
-                        isSelected = (item as SelectableItemBase).isSelected
+                        isSelected = isSelected
                     )
                 }
 

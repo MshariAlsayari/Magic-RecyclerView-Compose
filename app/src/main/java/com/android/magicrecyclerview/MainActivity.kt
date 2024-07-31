@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -25,6 +28,7 @@ import com.android.magic_recyclerview.component.list.verical.swapable.VerticalSw
 import com.android.magic_recyclerview.model.ActionIconStyle
 import com.android.magic_recyclerview.model.MenuAction
 import com.android.magic_recyclerview.model.SelectableListStyle
+import com.android.magic_recyclerview.model.SelectionStyle
 import com.android.magic_recyclerview.model.SwipableAction
 import com.android.magic_recyclerview.model.SwipableListStyle
 import com.android.magic_recyclerview.model.SwipeBackgroundStyle
@@ -43,63 +47,48 @@ var DEFAULT_LIST = DataProvider.itemList
 @ExperimentalFoundationApi
 class MainActivity : ComponentActivity() {
 
+    private val mainViewModel by viewModels<MainViewModel> { MainViewModel.Factory }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val testList = mutableListOf<Anime>()
-        for (i in 1..5) {
-            testList.addAll(DEFAULT_LIST.map { it })
-        }
 
         setContent {
             MagicRecyclerViewTheme {
-                var listType by rememberSaveable { mutableStateOf(ListType.VERTICAL_SWIPE) }
-
+                val uiState by mainViewModel.uiState.collectAsState()
+                val tabIndex = uiState.selectedTabIndex
                 Scaffold(
                     topBar = {
                         TopAppBar(title = { Text(text = "Easy List") })
-
                     }
 
                 ) {
-
                     Surface(
                         modifier = Modifier.padding(it),
                         color = MaterialTheme.colors.background
                     ) {
 
                         Column {
-
-                            var tabIndex by remember { mutableIntStateOf(0) } // 1.
-                            val tabTitles =
-                                listOf("Vertical Swipe", "Vertical Select", "Horizontal", "Grid")
-                            Column { // 2.
+                            val tabTitles = listOf("Vertical Swipe", "Vertical Select", "Horizontal", "Grid")
+                            Column {
                                 TabRow(
                                     selectedTabIndex = tabIndex
-                                ) { // 3.
+                                ) {
                                     tabTitles.forEachIndexed { index, title ->
                                         Tab(
                                             modifier = Modifier.background(Color.White),
                                             selectedContentColor = colorResource(id = R.color.purple_200),
-                                            selected = tabIndex == index, // 4.
-                                            onClick = { tabIndex = index },
-                                            text = { Text(text = title) }) // 5.
+                                            selected = tabIndex == index,
+                                            onClick = { mainViewModel.onSelectTab(index) },
+                                            text = { Text(text = title) })
                                     }
-                                }
-                                when (tabIndex) { // 6.
-                                    0 -> listType = ListType.VERTICAL_SWIPE
-                                    1 -> listType = ListType.VERTICAL_SELECT
-                                    2 -> listType = ListType.HORIZONTAL
-                                    3 -> listType = ListType.GRID
                                 }
                             }
 
-
-
-                            when (listType) {
-                                ListType.VERTICAL_SWIPE -> VerticalList(testList)
-                                ListType.VERTICAL_SELECT -> VerticalSelectList(testList)
-                                ListType.HORIZONTAL -> HorizontalList(testList)
-                                ListType.GRID -> GridList(testList)
+                            when (tabIndex) {
+                                ListType.VERTICAL_SWIPE.index -> VerticalList(DEFAULT_LIST)
+                                ListType.VERTICAL_SELECT.index -> VerticalSelectList(DEFAULT_LIST)
+                                ListType.HORIZONTAL.index -> HorizontalList(DEFAULT_LIST)
+                                ListType.GRID.index -> GridList(DEFAULT_LIST)
                             }
                         }
 
@@ -245,20 +234,44 @@ fun VerticalList(list: List<Anime>) {
 fun VerticalSelectList(list: List<Anime>) {
 
     val context = LocalContext.current
+    val selectedItems = remember { mutableStateListOf<Anime>() }
     var isLoading by rememberSaveable { mutableStateOf(true) }
     var isRefreshing by rememberSaveable { mutableStateOf(false) }
-    var isMultiSelectionMode by rememberSaveable { mutableStateOf(false) }
+    var isMultiSelectionMode by remember { mutableStateOf(false) }
+
+    val reset = {
+        selectedItems.clear()
+    }
+
+    val onItemSelected: (Anime)->Unit = { item->
+            if(selectedItems.contains(item)){
+                selectedItems.remove(item)
+            }else{
+                selectedItems.add(item)
+            }
+    }
+
+    LaunchedEffect(isMultiSelectionMode) {
+        if(!isMultiSelectionMode){
+            reset()
+        }
+
+    }
+
+    LaunchedEffect(selectedItems.size) {
+        isMultiSelectionMode = selectedItems.isNotEmpty()
+    }
 
     LaunchedEffect(key1 = isLoading) {
         if (isLoading) {
-            delay(2000)
+            delay(1000)
             isLoading = false
         }
     }
 
     LaunchedEffect(key1 = isRefreshing) {
         if (isRefreshing) {
-            delay(2000)
+            delay(1000)
             isRefreshing = false
         }
     }
@@ -269,7 +282,7 @@ fun VerticalSelectList(list: List<Anime>) {
         iconRes = R.drawable.ic_archive,
         onClicked = { items ->
             //implement a function
-            isMultiSelectionMode = false
+            reset()
             Toast.makeText(context, "The start Archive action was clicked", Toast.LENGTH_SHORT)
                 .show()
         })
@@ -280,7 +293,7 @@ fun VerticalSelectList(list: List<Anime>) {
         iconRes = R.drawable.ic_delete,
         onClicked = { items ->
             //implement a function
-            isMultiSelectionMode = false
+            reset()
             Toast.makeText(context, "The start Delete action was clicked", Toast.LENGTH_SHORT)
                 .show()
         })
@@ -288,10 +301,11 @@ fun VerticalSelectList(list: List<Anime>) {
 
     val startEdit = MenuAction<Anime>(
         text = "Edit",
+        clickable = false,
         iconRes = R.drawable.ic_edit,
         onClicked = { items ->
             //implement a function
-            isMultiSelectionMode = false
+            reset()
             Toast.makeText(context, "The start Edit action was clicked", Toast.LENGTH_SHORT).show()
         })
 
@@ -299,16 +313,21 @@ fun VerticalSelectList(list: List<Anime>) {
     VerticalSelectableList(
         modifier = Modifier,
         list = list,
+        selectedItemsList = selectedItems,
         onItemClicked = { item, p ->
-            if (isMultiSelectionMode) {
-                //handle adding an item to list
+            if(isMultiSelectionMode){
+                onItemSelected(item)
             }
+
         },
         onItemLongClicked = { item, po ->
-            isMultiSelectionMode = !isMultiSelectionMode
             if(isMultiSelectionMode){
-
+                reset()
+            }else{
+                onItemSelected(item)
             }
+
+
         },
         view = { AnimeCard(anime = it) },
         emptyView = { emptyView() },
@@ -323,7 +342,15 @@ fun VerticalSelectList(list: List<Anime>) {
             ),
             enabledActionIconStyle = ActionIconStyle.Default.copy(
                 color = Color.Magenta
-            )
+            ),
+            disabledActionTextStyle = TextStyle().copy(
+                textAlign = TextAlign.Center,
+                color = Color.LightGray
+            ),
+            disabledActionIconStyle = ActionIconStyle.Default.copy(
+                color = Color.LightGray
+            ),
+
         ),
         onRefresh = {
             isRefreshing = true

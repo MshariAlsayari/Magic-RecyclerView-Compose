@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 fun <T:SelectableItemBase> VerticalSelectableList(
     modifier: Modifier = Modifier,
     list: List<T>,
+    selectedItemsList: List<T>,
     view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
     selectedSelectionView: (@Composable () -> Unit)? = null,
@@ -48,6 +49,7 @@ fun <T:SelectableItemBase> VerticalSelectableList(
     onRefresh: (() -> Unit)? = null,
     scrollTo: Int = 0,
 ) {
+
 
 
     SwipeRefresh(
@@ -72,6 +74,7 @@ fun <T:SelectableItemBase> VerticalSelectableList(
 
                         SelectableLazyList(
                             list = list,
+                            selectedItemsList=selectedItemsList,
                             view = view,
                             dividerView = dividerView,
                             selectedSelectionView=selectedSelectionView,
@@ -115,6 +118,7 @@ fun <T:SelectableItemBase> VerticalSelectableList(
 @Composable
 private fun <T> SelectableLazyList(
     list: List<T>,
+    selectedItemsList: List<T>,
     view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
     selectedSelectionView: (@Composable () -> Unit)? = null,
@@ -147,6 +151,7 @@ private fun <T> SelectableLazyList(
 
                     SelectableListItem(
                         item = item,
+                        isSelected = selectedItemsList.contains(item),
                         view=view,
                         selectedSelectionView=selectedSelectionView,
                         unselectedSelectionView = unselectedSelectionView,

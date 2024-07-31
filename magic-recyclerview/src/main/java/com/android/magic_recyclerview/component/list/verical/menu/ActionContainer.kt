@@ -60,7 +60,7 @@ internal fun <T> ActionContainer(
         shape = RoundedCornerShape(style.menuActionsContainerStyle.radiusCorner),
         modifier = modifier
             .background(style.menuActionsContainerStyle.color)
-            .padding(18.dp)
+            .padding(style.menuActionsContainerStyle.padding)
             .fillMaxWidth()
             .height(style.menuActionsContainerStyle.height)
     ) {

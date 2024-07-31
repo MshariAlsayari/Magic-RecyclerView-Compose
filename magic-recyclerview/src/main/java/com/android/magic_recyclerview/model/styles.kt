@@ -16,7 +16,9 @@ import com.android.magic_recyclerview.Constants.ACTION_ICON_SIZE
 import com.android.magic_recyclerview.Constants.BORDER_WIDTH
 import com.android.magic_recyclerview.Constants.ELEVATION
 import com.android.magic_recyclerview.Constants.HEIGHT
+import com.android.magic_recyclerview.Constants.PADDING
 import com.android.magic_recyclerview.Constants.RADIUS_CORNER
+import com.android.magic_recyclerview.Constants.SELECTION_SHAPE
 import com.android.magic_recyclerview.Constants.SELECTION_SIZE
 
 
@@ -45,6 +47,7 @@ data class MenuActionsContainerStyle(
     val radiusCorner: Dp = RADIUS_CORNER,
     val elevation: Dp = ELEVATION,
     val height: Dp = HEIGHT,
+    val padding: Dp = PADDING,
     val color: Color = Color.Unspecified
 ){
     companion object {
@@ -55,7 +58,7 @@ data class MenuActionsContainerStyle(
 
 data class SelectionStyle(
     val size: Dp = SELECTION_SIZE,
-    val shape: Shape = CircleShape,
+    val shape: Shape = SELECTION_SHAPE,
     val checkIcon: ImageVector = Icons.Default.Check,
     val iconColor:Color = Color.Unspecified,
     val selectionBackground:Color = Color.Unspecified,

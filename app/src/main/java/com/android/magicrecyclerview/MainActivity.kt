@@ -113,14 +113,14 @@ fun VerticalList(list: List<Anime>) {
 
     LaunchedEffect(key1 = isLoading) {
         if (isLoading) {
-            delay(2000)
+            delay(1000)
             isLoading = false
         }
     }
 
     LaunchedEffect(key1 = isRefreshing) {
         if (isRefreshing) {
-            delay(2000)
+            delay(1000)
             isRefreshing = false
         }
     }
@@ -243,12 +243,12 @@ fun VerticalSelectList(list: List<Anime>) {
         selectedItems.clear()
     }
 
-    val onItemSelected: (Anime)->Unit = { item->
-            if(selectedItems.contains(item)){
-                selectedItems.remove(item)
-            }else{
-                selectedItems.add(item)
-            }
+    val onItemSelected: (Anime) -> Unit = { item ->
+        if (selectedItems.contains(item)) {
+            selectedItems.remove(item)
+        } else {
+            selectedItems.add(item)
+        }
     }
 
     LaunchedEffect(isMultiSelectionMode) {
@@ -301,7 +301,6 @@ fun VerticalSelectList(list: List<Anime>) {
 
     val startEdit = MenuAction<Anime>(
         text = "Edit",
-        clickable = false,
         iconRes = R.drawable.ic_edit,
         onClicked = { items ->
             //implement a function
@@ -318,7 +317,6 @@ fun VerticalSelectList(list: List<Anime>) {
             if(isMultiSelectionMode){
                 onItemSelected(item)
             }
-
         },
         onItemLongClicked = { item, po ->
             if(isMultiSelectionMode){
@@ -326,15 +324,13 @@ fun VerticalSelectList(list: List<Anime>) {
             }else{
                 onItemSelected(item)
             }
-
-
         },
         view = { AnimeCard(anime = it) },
         emptyView = { emptyView() },
         isMultiSelectionMode = isMultiSelectionMode,
         isLoading = isLoading,
         isRefreshing = isRefreshing,
-        actions = listOf(startArchive, startDelete, startEdit),
+        actions = listOf(startArchive, startDelete, startEdit,startArchive, startDelete, startEdit),
         style = SelectableListStyle.Default.copy(
             enabledActionTextStyle = TextStyle().copy(
                 textAlign = TextAlign.Center,

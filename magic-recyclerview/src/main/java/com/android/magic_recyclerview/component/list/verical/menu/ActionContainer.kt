@@ -1,5 +1,6 @@
 package com.android.magic_recyclerview.component.list.verical.menu
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
@@ -57,6 +59,7 @@ internal fun <T> ActionContainer(
         elevation = style.menuActionsContainerStyle.elevation,
         shape = RoundedCornerShape(style.menuActionsContainerStyle.radiusCorner),
         modifier = modifier
+            .background(style.menuActionsContainerStyle.color)
             .padding(18.dp)
             .fillMaxWidth()
             .height(style.menuActionsContainerStyle.height)
@@ -66,7 +69,6 @@ internal fun <T> ActionContainer(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-
             bottomActions.forEach { action ->
                 MenuActionItem(
                     modifier = Modifier.fillMaxHeight(),
@@ -77,8 +79,6 @@ internal fun <T> ActionContainer(
                         action.onClicked(items)
                     })
             }
-
-
         }
     }
 

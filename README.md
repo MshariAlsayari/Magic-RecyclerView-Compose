@@ -45,8 +45,8 @@ This is an Android Library that's implemented in compose to help you to build a 
 
 
 ## Examples
-There are three types of a List ***Vertical, Horizontal and Grid.***
-In the vertical list you can make items swappable by adding list of Action onStart or onEnd
+There are four types of Lists ***VerticalSwipable, VerticalSelectable, Horizontal and Grid.***
+In the VerticalSwipable list you can make items swappable by adding list of Action onStart or onEnd. In the VerticalSelectable list you can enable and disable a multi selection mode to make your list items selectable
 
 
 ```

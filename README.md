@@ -172,48 +172,98 @@ fun MyScreen() {
 
 
 ## VerticalSelect
+In this example we should have a model let's say Anime and it must extend from base class SelectableItemBase
+
+```
+data class Anime (
+    val animeId:Int,
+    val animeName:String,
+    val anumeImg:String,
+):SelectableItemBase(id = animeId.toLong(), rowType = RowType.ITEM)
 ```
 
- /***
- * modifier - the modifier to apply to this layout.
- * list -  list of data.
- * selectedItemsList - a list contains selected items
- * view - the data view holder.
- * onItemClicked - callback when a item's been clicked
- * onItemLongClicked - callback when a item's been clicked
- * isMultiSelectionMode
- * dividerView - (optional) divider between items.
- * emptyView - (optional) emptyView if the list is empty.
- * actions - list of actions.
- * isLoading - show loading content progress.
- * loadingProgress - (optional) if null will show CircularProgressIndicator().
- * isRefreshing - show progress of the swipeRefreshLayout.
- * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
- * scrollTo - scroll to item default is 0.
- * style - style is a class to add style all components in a list
+
+```
+abstract class SelectableItemBase(
+    open var id:Long,
+    open var rowType: RowType,
+    open var selected:Boolean = false,
+    open var selectable:Boolean = true
+)
+
+enum class RowType{
+    ITEM,HEADER
+}
+```
+
+
+```
+/***
+ * modifier: Modifier for styling the list.
+ * list: The LazyPagingItems list to display.
+ * view: Composable function to display each item.
+ * dividerView: (Optional) Composable function to show between items.
+ * emptyView: (Optional) Composable function for the empty state.
+ * loadingProgress: (Optional) Composable function for loading state.
+ * onItemClicked: Callback for item click action.
+ * onItemDoubleClicked: Callback for item double click action.
+ * startActions: Actions available when swiping from the start.
+ * endActions: Actions available when swiping from the end.
+ * style: Custom style for the swipable list.
+ * isLoading: Boolean indicating loading state.
+ * isRefreshing: Boolean indicating refresh state.
+ * onRefresh: Callback for refreshing the list.
+ * scrollTo: Index to scroll to on initialization.
  */
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
 @Composable
-fun <T:SelectableItemBase> VerticalSelectableList(
+fun <T : SelectableItemBase> VerticalSwipablePagedList(
     modifier: Modifier = Modifier,
-    list: List<T>,
-    selectedItemsList: List<T>,
+    list: LazyPagingItems<T>?,
     view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
-    selectedSelectionView: (@Composable () -> Unit)? = null,
-    unselectedSelectionView: (@Composable () -> Unit)? = null,
     emptyView: (@Composable () -> Unit)? = null,
     loadingProgress: (@Composable () -> Unit)? = null,
-    onItemClicked: (item: T, position: Int) -> Unit,
-    onItemLongClicked: (item: T, position: Int) -> Unit,
-    actions: List<MenuAction<T>> = listOf(),
-    isMultiSelectionMode: Boolean = false,
-    style: SelectableListStyle = SelectableListStyle.Default,
-    scrollTo: Int = 0,
+    onItemClicked: (item: T) -> Unit,
+    onItemDoubleClicked: (item: T) -> Unit,
+    startActions: List<SwipableAction<T>> = listOf(),
+    endActions: List<SwipableAction<T>> = listOf(),
     isLoading: Boolean = false,
     isRefreshing: Boolean = false,
+    style: SwipableListStyle = SwipableListStyle.Default,
+    scrollTo: Int = 0,
     onRefresh: (() -> Unit)? = null,
-) 
+)
+
+
+@ExperimentalComposeUiApi
+@ExperimentalMaterialApi
+@Composable
+fun ExampleUsage() {
+    val items: LazyPagingItems<MyItem> = // provide your LazyPagingItems here
+    VerticalSwipablePagedList(
+        list = items,
+        view = { item ->
+            Text(text = item.name)
+        },
+        onItemClicked = { item ->
+            // Handle item click
+        },
+        onItemDoubleClicked = { item ->
+            // Handle item double-click
+        },
+        startActions = listOf(SwipableAction(...)),
+        endActions = listOf(SwipableAction(...)),
+        isLoading = false,
+        isRefreshing = false,
+        style = SwipableListStyle.Default,
+        scrollTo = 0,
+        onRefresh = {
+            // Handle refresh
+        }
+    )
+}
 ```
 
 

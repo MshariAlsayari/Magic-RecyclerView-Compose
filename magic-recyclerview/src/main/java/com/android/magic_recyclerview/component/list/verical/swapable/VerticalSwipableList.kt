@@ -23,22 +23,21 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
 /***
- * modifier - the modifier to apply to this layout.
- * list -  list of data.
- * view - the data view holder.
- * onItemClicked - callback when the swappable item's been clicked
- * onItemCollapsed - callback when the swappable item's been collapsed
- * onItemExpanded - callback when the swappable item's been expanded
- * dividerView - (optional) divider between items.
- * emptyView - (optional) emptyView if the list is empty.
- * startActions - list of actions if it is empty no swipe .
- * endActions - list of actions if it is empty no swipe .
- * isLoading - show loading content progress.
- * loadingProgress - (optional) if null will show CircularProgressIndicator().
- * isRefreshing - show progress of the swipeRefreshLayout.
- * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
- * scrollTo - scroll to item default is 0.
- * style - style is class to add style on background of actions container
+ * modifier: Modifier for styling the list.
+ * list: Data source for the items in the list.
+ * view: Composable function to display each item.
+ * dividerView: (Optional) Composable function to show between items.
+ * emptyView: (Optional) Composable function for the empty state.
+ * loadingProgress: (Optional) Composable function for loading state.
+ * onItemClicked: Callback for item click action.
+ * onItemDoubleClicked: Callback for item double click action.
+ * startActions: Actions available when swiping from the start.
+ * endActions: Actions available when swiping from the end.
+ * style: Custom style for the swipable list.
+ * isLoading: Boolean indicating loading state.
+ * isRefreshing: Boolean indicating refresh state.
+ * onRefresh: Callback for refreshing the list.
+ * scrollTo: Index to scroll to on initialization.
  */
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi

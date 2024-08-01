@@ -30,7 +30,7 @@ fun AnimeCard(anime: Anime) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
             Image(
-                painter = rememberImagePainter(anime.anime_img),
+                painter = rememberImagePainter(anime.anumeImg),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier.size(100.dp)
@@ -43,7 +43,7 @@ fun AnimeCard(anime: Anime) {
                     .align(Alignment.CenterVertically)
             ) {
                 Text(
-                    text = anime.anime_name,
+                    text = anime.animeName,
                     style = MaterialTheme.typography.h6,
                     color = Color.Black
                 )
@@ -60,7 +60,7 @@ fun AnimeGridCard(anime: Anime) {
         shape = RoundedCornerShape(0.dp),
     ) {
         Image(
-            painter = rememberImagePainter(anime.anime_img),
+            painter = rememberImagePainter(anime.anumeImg),
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
             modifier = Modifier.fillMaxSize()

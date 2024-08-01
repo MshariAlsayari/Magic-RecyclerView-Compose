@@ -28,11 +28,30 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
+/***
+ * modifier - the modifier to apply to this layout.
+ * list -  list of data.
+ * selectedItemsList - a list contains selected items
+ * view - the data view holder.
+ * onItemClicked - callback when a item's been clicked
+ * onItemLongClicked - callback when a item's been clicked
+ * isMultiSelectionMode
+ * dividerView - (optional) divider between items.
+ * emptyView - (optional) emptyView if the list is empty.
+ * actions - list of actions.
+ * isLoading - show loading content progress.
+ * loadingProgress - (optional) if null will show CircularProgressIndicator().
+ * isRefreshing - show progress of the swipeRefreshLayout.
+ * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
+ * scrollTo - scroll to item default is 0.
+ * style - style is a class to add style all components in a list
+ */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun <T : SelectableItemBase> VerticalSelectablePagedList(
     modifier: Modifier = Modifier,
     list: LazyPagingItems<T>?,
+    selectedItemsList: List<T>,
     view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
     emptyView: (@Composable () -> Unit)? = null,
@@ -73,6 +92,7 @@ fun <T : SelectableItemBase> VerticalSelectablePagedList(
 
                         SelectableLazyPagedList(
                             list = list,
+                            selectedItemsList = selectedItemsList,
                             view = view,
                             dividerView = dividerView,
                             selectedSelectionView=selectedSelectionView,
@@ -91,9 +111,7 @@ fun <T : SelectableItemBase> VerticalSelectablePagedList(
                             exit = scaleOut(),
                         ) {
                             ActionContainer(
-                                selectedItem = list.itemSnapshotList.filter {
-                                    it is SelectableItemBase && it.isSelected
-                                }.filterNotNull(),
+                                selectedItem = selectedItemsList,
                                 style = style,
                                 actions = actions
                             )
@@ -118,6 +136,7 @@ fun <T : SelectableItemBase> VerticalSelectablePagedList(
 @Composable
 private fun <T : SelectableItemBase> SelectableLazyPagedList(
     list: LazyPagingItems<T>,
+    selectedItemsList: List<T>,
     view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
     selectedSelectionView: (@Composable () -> Unit)? = null,
@@ -145,7 +164,7 @@ private fun <T : SelectableItemBase> SelectableLazyPagedList(
             val item = list[index]
 
             item?.let {
-                if ((item as SelectableItemBase).isSelectable) {
+                if ((item as SelectableItemBase).selectable) {
                     Box(
                         modifier = Modifier.combinedClickable(
                             onClick = {

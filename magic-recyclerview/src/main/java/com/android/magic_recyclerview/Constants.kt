@@ -22,7 +22,7 @@ internal object Constants {
     val ELEVATION = 4.dp
     val HEIGHT = 85.dp
     val PADDING = 44.dp
-    val SELECTION_SHAPE= CircleShape
+    val SELECTION_SHAPE = CircleShape
     val SELECTION_SIZE = 32.dp
     val BORDER_WIDTH = 1.dp
 }

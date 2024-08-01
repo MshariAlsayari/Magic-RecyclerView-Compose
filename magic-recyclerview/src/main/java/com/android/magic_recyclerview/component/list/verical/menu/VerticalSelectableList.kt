@@ -22,11 +22,27 @@ import com.android.magic_recyclerview.component.magic_recyclerview.LoadingView
 import com.android.magic_recyclerview.component.magic_recyclerview.UnSelectableItem
 import com.android.magic_recyclerview.model.MenuAction
 import com.android.magic_recyclerview.model.SelectableListStyle
-import com.android.magic_recyclerview.model.SwipableListStyle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
-
+/***
+ * modifier - the modifier to apply to this layout.
+ * list -  list of data.
+ * selectedItemsList - a list contains selected items
+ * view - the data view holder.
+ * onItemClicked - callback when a item's been clicked
+ * onItemLongClicked - callback when a item's been clicked
+ * isMultiSelectionMode
+ * dividerView - (optional) divider between items.
+ * emptyView - (optional) emptyView if the list is empty.
+ * actions - list of actions.
+ * isLoading - show loading content progress.
+ * loadingProgress - (optional) if null will show CircularProgressIndicator().
+ * isRefreshing - show progress of the swipeRefreshLayout.
+ * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
+ * scrollTo - scroll to item default is 0.
+ * style - style is a class to add style all components in a list
+ */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun <T:SelectableItemBase> VerticalSelectableList(
@@ -44,10 +60,10 @@ fun <T:SelectableItemBase> VerticalSelectableList(
     actions: List<MenuAction<T>> = listOf(),
     isMultiSelectionMode: Boolean = false,
     style: SelectableListStyle = SelectableListStyle.Default,
+    scrollTo: Int = 0,
     isLoading: Boolean = false,
     isRefreshing: Boolean = false,
     onRefresh: (() -> Unit)? = null,
-    scrollTo: Int = 0,
 ) {
 
 
@@ -93,7 +109,7 @@ fun <T:SelectableItemBase> VerticalSelectableList(
                             exit = scaleOut(),
                         ) {
                             ActionContainer(
-                                selectedItem = list.filter { (it as SelectableItemBase).isSelected },
+                                selectedItem = selectedItemsList,
                                 style = style,
                                 actions = actions
                             )
@@ -116,7 +132,7 @@ fun <T:SelectableItemBase> VerticalSelectableList(
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-private fun <T> SelectableLazyList(
+private fun <T:SelectableItemBase> SelectableLazyList(
     list: List<T>,
     selectedItemsList: List<T>,
     view: @Composable (T) -> Unit,
@@ -140,7 +156,8 @@ private fun <T> SelectableLazyList(
     ) {
         itemsIndexed(list) { index, item ->
 
-            if((item as SelectableItemBase).isSelectable){
+
+            if((item as SelectableItemBase).selectable){
                 Box(modifier = Modifier.combinedClickable (
                     onClick = {
                         onItemClicked(item,index)

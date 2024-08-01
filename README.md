@@ -9,7 +9,8 @@
 - [Introduction](#introduction)
 - [Setup](#setup)
 - [Examples](#examples)
-   - [Vertical](#vertical)
+   - [Vertical-swipe](#verticalSwipe)
+   - [Vertical-select](#VerticalSelect)
    - [Horizontal](#horizontal)
    - [Grid](#grid)
 
@@ -63,66 +64,101 @@ data class Action<T>(
     val onClicked: ((position: Int, item: T) -> Unit)? = null,
     val actionSize: Dp = ACTION_ICON_SIZE.dp
 )
-)
 ```
 
 
-## Vertical
 
-
+## VerticalSwipe
 ```
 /***
  * modifier - the modifier to apply to this layout.
  * list -  list of data.
- * views - the data view holder.
+ * view - the data view holder.
  * onItemClicked - callback when the swappable item's been clicked
  * onItemCollapsed - callback when the swappable item's been collapsed
  * onItemExpanded - callback when the swappable item's been expanded
  * dividerView - (optional) divider between items.
- * emptyView - (optional) emptyview if the list is empty.
- * startActions - list of actions if it is empty no swipe (3 items at most).
- * endActions - list of actions if it is empty no swipe (3 items at most).
- * actionBackgroundRadiusCorner - radius corner for both start background and end background actions.
+ * emptyView - (optional) emptyView if the list is empty.
+ * startActions - list of actions if it is empty no swipe .
+ * endActions - list of actions if it is empty no swipe .
  * isLoading - show loading content progress.
  * loadingProgress - (optional) if null will show CircularProgressIndicator().
  * isRefreshing - show progress of the swipeRefreshLayout.
  * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
- * paddingBetweenItems - padding between items default is 8f.
- * paddingVertical - padding on top and bottom of the whole list default is 0.
- * paddingHorizontal - padding on left and right of the whole list default is 0.
  * scrollTo - scroll to item default is 0.
+ * style - style is class to add style on background of actions container
  */
-
+ 
+@ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun <T> VerticalEasyList(
+fun <T> VerticalSwipableList(
     modifier: Modifier = Modifier,
     list: List<T>,
-    views: @Composable LazyItemScope.(item: T) -> Unit,
-    onItemClicked: (item: T, position: Int) -> Unit,
-    onItemCollapsed: ((item: T, position: Int) -> Unit)? = null,
-    onItemExpanded: ((item: T, position: Int, type: ActionRowType) -> Unit)? = null,
+    view: @Composable (T) -> Unit,
     dividerView: (@Composable () -> Unit)? = null,
     emptyView: (@Composable () -> Unit)? = null,
-    startActions: List<Action<T>> = listOf(),
-    endActions: List<Action<T>> = listOf(),
-    actionBackgroundRadiusCorner: Float = 0f,
-    actionBackgroundHeight: Float = ACTION_HEIGHT,
-    isLoading: Boolean = false,
     loadingProgress: (@Composable () -> Unit)? = null,
+    onItemClicked: (item: T) -> Unit,
+    onItemDoubleClicked: (item: T) -> Unit,
+    startActions: List<SwipableAction<T>> = listOf(),
+    endActions: List<SwipableAction<T>> = listOf(),
+    style: SwipableListStyle = SwipableListStyle.Default,
+    isLoading: Boolean = false,
     isRefreshing: Boolean = false,
     onRefresh: (() -> Unit)? = null,
-    paddingBetweenItems: Float = PADDING_BETWEEN_ITEMS,
-    paddingVertical: Float = PADDING_VERTICAL,
-    paddingHorizontal: Float = PADDING_HORIZONTAL,
     scrollTo: Int = 0,
 )
- 
 ```
 
+
+## VerticalSelect
+```
+
+ /***
+ * modifier - the modifier to apply to this layout.
+ * list -  list of data.
+ * selectedItemsList - a list contains selected items
+ * view - the data view holder.
+ * onItemClicked - callback when a item's been clicked
+ * onItemLongClicked - callback when a item's been clicked
+ * isMultiSelectionMode
+ * dividerView - (optional) divider between items.
+ * emptyView - (optional) emptyView if the list is empty.
+ * actions - list of actions.
+ * isLoading - show loading content progress.
+ * loadingProgress - (optional) if null will show CircularProgressIndicator().
+ * isRefreshing - show progress of the swipeRefreshLayout.
+ * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
+ * scrollTo - scroll to item default is 0.
+ * style - style is a class to add style all components in a list
+ */
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
+@Composable
+fun <T:SelectableItemBase> VerticalSelectableList(
+    modifier: Modifier = Modifier,
+    list: List<T>,
+    selectedItemsList: List<T>,
+    view: @Composable (T) -> Unit,
+    dividerView: (@Composable () -> Unit)? = null,
+    selectedSelectionView: (@Composable () -> Unit)? = null,
+    unselectedSelectionView: (@Composable () -> Unit)? = null,
+    emptyView: (@Composable () -> Unit)? = null,
+    loadingProgress: (@Composable () -> Unit)? = null,
+    onItemClicked: (item: T, position: Int) -> Unit,
+    onItemLongClicked: (item: T, position: Int) -> Unit,
+    actions: List<MenuAction<T>> = listOf(),
+    isMultiSelectionMode: Boolean = false,
+    style: SelectableListStyle = SelectableListStyle.Default,
+    scrollTo: Int = 0,
+    isLoading: Boolean = false,
+    isRefreshing: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
+) 
+```
+
+
 ## Horizontal
-
-
 ```
 
 /***
@@ -152,13 +188,11 @@ fun <T> HorizontalEasyList(
     paddingHorizontal: Float = PADDING_HORIZONTAL,
     scrollTo: Int = 0,
 )
- 
+
 ```
 
 
 ## Grid
-
-
 ```
 
 /***
@@ -195,7 +229,6 @@ fun <T> GridEasyList(
     loadingProgress: (@Composable () -> Unit)? = null,
     scrollTo: Int = 0,
 )
- 
 ```
 
 

@@ -30,23 +30,16 @@ import kotlinx.coroutines.launch
  * onItemCollapsed - callback when the swappable item's been collapsed
  * onItemExpanded - callback when the swappable item's been expanded
  * dividerView - (optional) divider between items.
- * emptyView - (optional) emptyview if the list is empty.
+ * emptyView - (optional) emptyView if the list is empty.
  * startActions - list of actions if it is empty no swipe .
  * endActions - list of actions if it is empty no swipe .
- * startActionBackgroundColor - background color of the list of the start actions.
- * endActionBackgroundColor - background color of the list of the end actions.
- * actionBackgroundRadiusCorner - radius corner for both start background and end background actions.
- * actionBackgroundHeight - height of the actions background.
  * isLoading - show loading content progress.
  * loadingProgress - (optional) if null will show CircularProgressIndicator().
  * isRefreshing - show progress of the swipeRefreshLayout.
  * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
- * paddingBetweenItems - padding between items default is 8f.
- * paddingVertical - padding on top and bottom of the whole list default is 0.
- * paddingHorizontal - padding on left and right of the whole list default is 0.
  * scrollTo - scroll to item default is 0.
+ * style - style is class to add style on background of actions container
  */
-
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
@@ -139,7 +132,7 @@ private fun <T> LazyList(
         state = listState
     ) {
         itemsIndexed(list) { index, item ->
-            if ((item as SelectableItemBase).isSelectable) {
+            if ((item as SelectableItemBase).selectable) {
                 ListItem(
                     item = item,
                     isLast = index == list.lastIndex,

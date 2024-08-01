@@ -69,6 +69,31 @@ data class Action<T>(
 
 
 ## VerticalSwipe
+
+In this example we should have a model let's say Anime and it must extend from base class SelectableItemBase
+
+```
+data class Anime (
+    val animeId:Int,
+    val animeName:String,
+    val anumeImg:String,
+):SelectableItemBase(id = animeId.toLong(), rowType = RowType.ITEM)
+```
+
+
+```
+abstract class SelectableItemBase(
+    open var id:Long,
+    open var rowType: RowType,
+    open var selected:Boolean = false,
+    open var selectable:Boolean = true
+)
+
+enum class RowType{
+    ITEM,HEADER
+}
+```
+
 ```
 /***
  * modifier - the modifier to apply to this layout.

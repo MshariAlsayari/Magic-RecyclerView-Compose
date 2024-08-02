@@ -10,7 +10,11 @@
 - [Setup](#setup)
 - [Examples](#examples)
    - [Vertical-swipe](#verticalSwipe)
+     - [Vertical-swipe-fixed](#verticalSwipeFixed) 
+     - [Vertical-swipe-paged](#verticalSwipePaged)
    - [Vertical-select](#VerticalSelect)
+     - [Vertical-select-fixed](#verticalSelectFixed)
+     - [Vertical-select-paged](#verticalSelectPaged)
    - [Horizontal](#horizontal)
    - [Grid](#grid)
 
@@ -20,8 +24,6 @@ This is an Android Library that's implemented in compose to help you to build a 
 
 
 ![signal-2022-02-21-141730](https://user-images.githubusercontent.com/32165999/154946820-b11702c4-a144-47fd-9dc1-3736fa269718.gif)
-
-
 
 
 ## Setup
@@ -69,8 +71,9 @@ data class Action<T>(
 
 
 ## VerticalSwipe
-
-In this example we should have a model let's say Anime and it must extend from base class SelectableItemBase
+We have two kine of Lists ***Fixed list and Pagination List***,
+we will explain both of them but first we need to explain some classes that we probably need them.
+let's say we have List of Anime.It must extend from the base class ***SelectableItemBase*** and if we need add actions on items like Delete, Edit or Archive ...etc we have the SwipableAction class
 
 ```
 data class Anime (
@@ -94,6 +97,32 @@ enum class RowType{
 }
 ```
 
+```
+/**
+* @text: The text to display for the action.
+* @icon: The icon to display for the action.
+* @textRes: A string resource for the action text.
+* @iconRes: A drawable resource for the action icon.
+* @backgroundColor: The background color for the action.
+* @actionTextStyle: The text style for the action text.
+* @actionIconStyle: The icon style for the action icon.
+* @onClicked: The callback to invoke when the action is clicked.
+ */
+data class SwipableAction<T>(
+    val text: String? = null,
+    val icon: ImageVector? = null,
+    @StringRes val textRes: Int? = null,
+    @DrawableRes val iconRes: Int? = null,
+    val backgroundColor: Color = Color.Transparent,
+    val actionTextStyle: TextStyle = TextStyle.Default,
+    val actionIconStyle:ActionIconStyle = ActionIconStyle.Default,
+    val onClicked: (item: T) -> Unit = {},
+)
+
+
+```
+
+## verticalSwipeFixed
 ```
 /***
  * modifier: Modifier for styling the list.
@@ -158,8 +187,26 @@ fun MyScreen() {
         onItemDoubleClicked = { item ->
             // Handle item double click
         },
-        startActions = listOf(/* Define swipable actions for the start */),
-        endActions = listOf(/* Define swipable actions for the end */),
+        startActions = listOf(
+            SwipableAction(
+                text = "Edit",
+                icon = Icons.Default.Edit,
+                backgroundColor = Color.Blue,
+                onClicked = { item ->
+                    // Handle edit action
+                }
+            )
+        ),
+        endActions = listOf(
+            SwipableAction(
+                text = "Delete",
+                icon = Icons.Default.Delete,
+                backgroundColor = Color.Red,
+                onClicked = { item ->
+                    // Handle delete action
+                }
+            )
+        ),
         isLoading = false,
         isRefreshing = false,
         onRefresh = { /* Handle refresh */ },
@@ -169,35 +216,9 @@ fun MyScreen() {
 
 
 ```
-
-
-## VerticalSelect
-In this example we should have a model let's say Anime and it must extend from base class SelectableItemBase
-
-```
-data class Anime (
-    val animeId:Int,
-    val animeName:String,
-    val anumeImg:String,
-):SelectableItemBase(id = animeId.toLong(), rowType = RowType.ITEM)
+## verticalSwipePaged
 ```
 
-
-```
-abstract class SelectableItemBase(
-    open var id:Long,
-    open var rowType: RowType,
-    open var selected:Boolean = false,
-    open var selectable:Boolean = true
-)
-
-enum class RowType{
-    ITEM,HEADER
-}
-```
-
-
-```
 /***
  * modifier: Modifier for styling the list.
  * list: The LazyPagingItems list to display.
@@ -236,11 +257,10 @@ fun <T : SelectableItemBase> VerticalSwipablePagedList(
     onRefresh: (() -> Unit)? = null,
 )
 
-
 @ExperimentalComposeUiApi
 @ExperimentalMaterialApi
 @Composable
-fun ExampleUsage() {
+fun MyScreen() {
     val items: LazyPagingItems<MyItem> = // provide your LazyPagingItems here
     VerticalSwipablePagedList(
         list = items,
@@ -253,8 +273,26 @@ fun ExampleUsage() {
         onItemDoubleClicked = { item ->
             // Handle item double-click
         },
-        startActions = listOf(SwipableAction(...)),
-        endActions = listOf(SwipableAction(...)),
+        startActions = listOf(
+            SwipableAction(
+                text = "Edit",
+                icon = Icons.Default.Edit,
+                backgroundColor = Color.Blue,
+                onClicked = { item ->
+                    // Handle edit action
+                }
+            )
+        ),
+        endActions = listOf(
+            SwipableAction(
+                text = "Delete",
+                icon = Icons.Default.Delete,
+                backgroundColor = Color.Red,
+                onClicked = { item ->
+                    // Handle delete action
+                }
+            )
+        ),
         isLoading = false,
         isRefreshing = false,
         style = SwipableListStyle.Default,
@@ -264,7 +302,146 @@ fun ExampleUsage() {
         }
     )
 }
+
+
 ```
+
+
+## VerticalSelect
+As we said in the **Vertical Swipeable lists section** we have Anime and SelectableItemBase but we have a new class of Actions SelectableAction
+
+```
+data class Anime (
+    val animeId:Int,
+    val animeName:String,
+    val anumeImg:String,
+):SelectableItemBase(id = animeId.toLong(), rowType = RowType.ITEM)
+```
+
+
+```
+abstract class SelectableItemBase(
+    open var id:Long,
+    open var rowType: RowType,
+    open var selected:Boolean = false,
+    open var selectable:Boolean = true
+)
+
+enum class RowType{
+    ITEM,HEADER
+}
+```
+
+```
+/**
+ * @text: The text to display for the action.
+ * @icon: The icon to display for the action.
+ * @textRes: A string resource for the action text.
+ * @iconRes: A drawable resource for the action icon.
+ * @actionSize: The size of the action icon.
+ * @visible: A boolean flag to control the visibility of the action.
+ * @clickable: A boolean flag to control the click ability of the action.
+ * @onClicked: The callback to invoke when the action is clicked.
+ */
+
+data class SelectableAction<T>(
+    val text: String? = null,
+    val icon: ImageVector? = null,
+    @StringRes val textRes: Int? = null,
+    @DrawableRes val iconRes: Int? = null,
+    val actionSize: Dp = ACTION_ICON_SIZE,
+    val visible: Boolean= true,
+    val clickable: Boolean= true,
+    val onClicked: (item: List<T>) -> Unit = {},
+)
+```
+
+## verticalSelectFixed
+```
+/**
+ * @modifier: A Modifier for the composable.
+ * @list: The list of items to display.
+ * @selectedItemsList: The list of currently selected items.
+ * @view: A composable function to display each item.
+ * @dividerView: A composable function to display between items.
+ * @selectedSelectionView: A composable function to display for selection view .
+ * @unselectedSelectionView: A composable function to display for un-selection view.
+ * @emptyView: A composable function to display when the list is empty.
+ * @loadingProgress: A composable function to display while loading.
+ * @onItemClicked: A callback for item click events.
+ * @onItemLongClicked: A callback for item long-click events.
+ * @actions: A list of actions that can be performed on items.
+ * @isMultiSelectionMode: A flag to indicate if multi-selection mode is enabled.
+ * @style: The style for the selectable list.
+ * @scrollTo: The index to scroll to.
+ * @isLoading: A flag to indicate if the list is loading.
+ * @isRefreshing: A flag to indicate if the list is refreshing.
+ * @onRefresh: A callback to trigger refresh.
+ */
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
+@Composable
+fun <T:SelectableItemBase> VerticalSelectableList(
+    modifier: Modifier = Modifier,
+    list: List<T>,
+    selectedItemsList: List<T>,
+    view: @Composable (T) -> Unit,
+    dividerView: (@Composable () -> Unit)? = null,
+    selectedSelectionView: (@Composable () -> Unit)? = null,
+    unselectedSelectionView: (@Composable () -> Unit)? = null,
+    emptyView: (@Composable () -> Unit)? = null,
+    loadingProgress: (@Composable () -> Unit)? = null,
+    onItemClicked: (item: T, position: Int) -> Unit,
+    onItemLongClicked: (item: T, position: Int) -> Unit,
+    actions: List<SelectableAction<T>> = listOf(),
+    isMultiSelectionMode: Boolean = false,
+    style: SelectableListStyle = SelectableListStyle.Default,
+    scrollTo: Int = 0,
+    isLoading: Boolean = false,
+    isRefreshing: Boolean = false,
+    onRefresh: (() -> Unit)? = null,
+)
+
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
+@Composable
+fun MyScreenUsage() {
+    val items: List<MyItem> = // provide your list of items here
+    val selectedItems: List<MyItem> = // provide your list of selected items here
+    VerticalSelectableList(
+        list = items,
+        selectedItemsList = selectedItems,
+        view = { item ->
+            Text(text = item.name)
+        },
+        onItemClicked = { item, position ->
+            // Handle item click
+        },
+        onItemLongClicked = { item, position ->
+            // Handle item long-click
+        },
+        actions = listOf(
+            SelectableAction(
+                text = "Delete",
+                icon = Icons.Default.Delete,
+                onClicked = { selectedItems ->
+                    // Handle delete action
+                }
+            )
+        ),
+        isMultiSelectionMode = true,
+        isLoading = false,
+        isRefreshing = false,
+        onRefresh = {
+            // Handle refresh
+        }
+    )
+}
+
+```
+
+## verticalSelectPaged
+```
+```
+
 
 
 ## Horizontal

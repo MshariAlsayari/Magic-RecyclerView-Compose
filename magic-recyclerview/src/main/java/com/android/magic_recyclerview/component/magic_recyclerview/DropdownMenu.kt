@@ -10,7 +10,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -18,7 +17,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableAction
 import com.android.magic_recyclerview.model.SelectableListStyle
 import com.android.magic_recyclerview.model.getIcon
 import com.android.magic_recyclerview.model.getText
@@ -28,11 +27,11 @@ import com.android.magic_recyclerview.model.getText
 internal fun <T> DropdownMenu(
     modifier: Modifier = Modifier,
     selectedItem: List<T> = listOf(),
-    itemDropdowns: List<MenuAction<T>> = listOf(),
+    itemDropdowns: List<SelectableAction<T>> = listOf(),
     style: SelectableListStyle = SelectableListStyle.Default,
     state: Boolean,
     onDismiss: () -> Unit,
-    onActionClicked: (selectedItem: List<T>, action: MenuAction<T>) -> Unit,
+    onActionClicked: (selectedItem: List<T>, action: SelectableAction<T>) -> Unit,
 ) {
 
     val isArabicLanguage = LocalLayoutDirection.current == LayoutDirection.Rtl

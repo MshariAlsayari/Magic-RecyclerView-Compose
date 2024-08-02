@@ -8,7 +8,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -22,7 +21,7 @@ import com.android.magic_recyclerview.SelectableItemBase
 import com.android.magic_recyclerview.component.magic_recyclerview.EmptyView
 import com.android.magic_recyclerview.component.magic_recyclerview.LoadingView
 import com.android.magic_recyclerview.component.magic_recyclerview.UnSelectableItem
-import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableAction
 import com.android.magic_recyclerview.model.SelectableListStyle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -60,7 +59,7 @@ fun <T : SelectableItemBase> VerticalSelectablePagedList(
     unselectedSelectionView: (@Composable () -> Unit)? = null,
     onItemClicked: (item: T, position: Int) -> Unit,
     onItemLongClicked: (item: T, position: Int) -> Unit,
-    actions: List<MenuAction<T>> = listOf(),
+    actions: List<SelectableAction<T>> = listOf(),
     isMultiSelectionMode: Boolean = false,
     style: SelectableListStyle = SelectableListStyle.Default,
     isLoading: Boolean = false,

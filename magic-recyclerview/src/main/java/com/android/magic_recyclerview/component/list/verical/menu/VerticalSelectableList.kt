@@ -20,28 +20,30 @@ import com.android.magic_recyclerview.SelectableItemBase
 import com.android.magic_recyclerview.component.magic_recyclerview.EmptyView
 import com.android.magic_recyclerview.component.magic_recyclerview.LoadingView
 import com.android.magic_recyclerview.component.magic_recyclerview.UnSelectableItem
-import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableAction
 import com.android.magic_recyclerview.model.SelectableListStyle
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
-/***
- * modifier - the modifier to apply to this layout.
- * list -  list of data.
- * selectedItemsList - a list contains selected items
- * view - the data view holder.
- * onItemClicked - callback when a item's been clicked
- * onItemLongClicked - callback when a item's been clicked
- * isMultiSelectionMode
- * dividerView - (optional) divider between items.
- * emptyView - (optional) emptyView if the list is empty.
- * actions - list of actions.
- * isLoading - show loading content progress.
- * loadingProgress - (optional) if null will show CircularProgressIndicator().
- * isRefreshing - show progress of the swipeRefreshLayout.
- * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
- * scrollTo - scroll to item default is 0.
- * style - style is a class to add style all components in a list
+/**
+ * @modifier: A Modifier for the composable.
+ * @list: The list of items to display.
+ * @selectedItemsList: The list of currently selected items.
+ * @view: A composable function to display each item.
+ * @dividerView: A composable function to display between items.
+ * @selectedSelectionView: A composable function to display for selection view .
+ * @unselectedSelectionView: A composable function to display for un-selection view.
+ * @emptyView: A composable function to display when the list is empty.
+ * @loadingProgress: A composable function to display while loading.
+ * @onItemClicked: A callback for item click events.
+ * @onItemLongClicked: A callback for item long-click events.
+ * @actions: A list of actions that can be performed on items.
+ * @isMultiSelectionMode: A flag to indicate if multi-selection mode is enabled.
+ * @style: The style for the selectable list.
+ * @scrollTo: The index to scroll to.
+ * @isLoading: A flag to indicate if the list is loading.
+ * @isRefreshing: A flag to indicate if the list is refreshing.
+ * @onRefresh: A callback to trigger refresh.
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -57,7 +59,7 @@ fun <T:SelectableItemBase> VerticalSelectableList(
     loadingProgress: (@Composable () -> Unit)? = null,
     onItemClicked: (item: T, position: Int) -> Unit,
     onItemLongClicked: (item: T, position: Int) -> Unit,
-    actions: List<MenuAction<T>> = listOf(),
+    actions: List<SelectableAction<T>> = listOf(),
     isMultiSelectionMode: Boolean = false,
     style: SelectableListStyle = SelectableListStyle.Default,
     scrollTo: Int = 0,

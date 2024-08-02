@@ -15,7 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.magic_recyclerview.R
-import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableAction
 import com.android.magic_recyclerview.model.SelectableListStyle
 import com.android.magic_recyclerview.model.SwipableAction
 import com.android.magic_recyclerview.model.getIcon
@@ -81,7 +81,7 @@ fun <T> ActionItem(
 fun <T> MenuActionItem(
     modifier: Modifier = Modifier,
     items: List<T>,
-    action: MenuAction<T>,
+    action: SelectableAction<T>,
     style: SelectableListStyle = SelectableListStyle.Default,
     onClicked: (item: List<T>) -> Unit,
 ) {

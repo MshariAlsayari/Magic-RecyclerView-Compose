@@ -10,8 +10,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -26,9 +24,8 @@ import com.android.magic_recyclerview.component.list.HorizontalEasyList
 import com.android.magic_recyclerview.component.list.verical.menu.VerticalSelectableList
 import com.android.magic_recyclerview.component.list.verical.swapable.VerticalSwipableList
 import com.android.magic_recyclerview.model.ActionIconStyle
-import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableAction
 import com.android.magic_recyclerview.model.SelectableListStyle
-import com.android.magic_recyclerview.model.SelectionStyle
 import com.android.magic_recyclerview.model.SwipableAction
 import com.android.magic_recyclerview.model.SwipableListStyle
 import com.android.magic_recyclerview.model.SwipeBackgroundStyle
@@ -277,7 +274,7 @@ fun VerticalSelectList(list: List<Anime>) {
     }
 
 
-    val startArchive = MenuAction<Anime>(
+    val startArchive = SelectableAction<Anime>(
         text = "Archive",
         iconRes = R.drawable.ic_archive,
         onClicked = { items ->
@@ -288,7 +285,7 @@ fun VerticalSelectList(list: List<Anime>) {
         })
 
 
-    val startDelete = MenuAction<Anime>(
+    val startDelete = SelectableAction<Anime>(
         text = "Delete",
         iconRes = R.drawable.ic_delete,
         onClicked = { items ->
@@ -299,7 +296,7 @@ fun VerticalSelectList(list: List<Anime>) {
         })
 
 
-    val startEdit = MenuAction<Anime>(
+    val startEdit = SelectableAction<Anime>(
         text = "Edit",
         iconRes = R.drawable.ic_edit,
         clickable = false,

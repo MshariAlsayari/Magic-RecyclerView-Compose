@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
@@ -18,11 +17,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.android.magic_recyclerview.R
 import com.android.magic_recyclerview.component.action_row.MenuActionItem
 import com.android.magic_recyclerview.component.magic_recyclerview.DropdownMenu
-import com.android.magic_recyclerview.model.MenuAction
+import com.android.magic_recyclerview.model.SelectableAction
 import com.android.magic_recyclerview.model.SelectableListStyle
 import com.android.magic_recyclerview.model.getText
 
@@ -30,17 +28,17 @@ import com.android.magic_recyclerview.model.getText
 internal fun <T> ActionContainer(
     modifier: Modifier = Modifier,
     selectedItem: List<T> = listOf(),
-    actions: List<MenuAction<T>>,
+    actions: List<SelectableAction<T>>,
     style: SelectableListStyle = SelectableListStyle.Default,
 ) {
 
     var moreActionsExtended by rememberSaveable { mutableStateOf(false) }
 
-    val bottomActions = mutableListOf<MenuAction<T>>()
-    val moreActions = mutableListOf<MenuAction<T>>()
+    val bottomActions = mutableListOf<SelectableAction<T>>()
+    val moreActions = mutableListOf<SelectableAction<T>>()
     val visibleActions = actions.filter { it.visible }
 
-    val moreAction = MenuAction<T>(
+    val moreAction = SelectableAction<T>(
         clickable = true,
         iconRes = R.drawable.ic_more,
         textRes = if(visibleActions.first().getText() != null) R.string.more else null,

@@ -8,16 +8,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.android.magic_recyclerview.Constants.ACTION_ICON_SIZE
 
 /**
- * @text: a text.
- * @icon: an icon.
- * @actionSize: action size default is 56.
- * @visible: callback to handle onClick.
- * @clickable: action size default is 56.
- * @onClicked - callback to handle onClick.
+* @text: The text to display for the action.
+* @icon: The icon to display for the action.
+* @textRes: A string resource for the action text.
+* @iconRes: A drawable resource for the action icon.
+* @backgroundColor: The background color for the action.
+* @actionTextStyle: The text style for the action text.
+* @actionIconStyle: The icon style for the action icon.
+* @onClicked: The callback to invoke when the action is clicked.
  */
 data class SwipableAction<T>(
     val text: String? = null,
@@ -30,7 +31,18 @@ data class SwipableAction<T>(
     val onClicked: (item: T) -> Unit = {},
 )
 
-data class MenuAction<T>(
+/**
+ * @text: The text to display for the action.
+ * @icon: The icon to display for the action.
+ * @textRes: A string resource for the action text.
+ * @iconRes: A drawable resource for the action icon.
+ * @actionSize: The size of the action icon.
+ * @visible: A boolean flag to control the visibility of the action.
+ * @clickable: A boolean flag to control the click ability of the action.
+ * @onClicked: The callback to invoke when the action is clicked.
+ */
+
+data class SelectableAction<T>(
     val text: String? = null,
     val icon: ImageVector? = null,
     @StringRes val textRes: Int? = null,
@@ -50,7 +62,7 @@ internal fun <T> SwipableAction<T>.getIcon() = iconRes ?: icon
 
 
 @Composable
-internal fun <T> MenuAction<T>.getText() =  if(textRes != null) stringResource(id = textRes) else text
+internal fun <T> SelectableAction<T>.getText() =  if(textRes != null) stringResource(id = textRes) else text
 
 @Composable
-internal fun <T> MenuAction<T>.getIcon() = iconRes ?: icon
+internal fun <T> SelectableAction<T>.getIcon() = iconRes ?: icon

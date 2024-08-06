@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
  * @loadingProgress: A composable function to display while loading.
  * @onItemClicked: A callback for item click events.
  * @onItemLongClicked: A callback for item long-click events.
+ * @onItemDoubleClicked: A callback for item double-click events.
  * @actions: A list of actions that can be performed on items.
  * @isMultiSelectionMode: A flag to indicate if multi-selection mode is enabled.
  * @style: The style for the selectable list.
@@ -59,6 +60,7 @@ fun <T:SelectableItemBase> VerticalSelectableList(
     loadingProgress: (@Composable () -> Unit)? = null,
     onItemClicked: (item: T, position: Int) -> Unit,
     onItemLongClicked: (item: T, position: Int) -> Unit,
+    onItemDoubleClicked: (item: T, position: Int) -> Unit,
     actions: List<SelectableAction<T>> = listOf(),
     isMultiSelectionMode: Boolean = false,
     style: SelectableListStyle = SelectableListStyle.Default,
@@ -102,6 +104,7 @@ fun <T:SelectableItemBase> VerticalSelectableList(
                             scrollTo = scrollTo,
                             onItemClicked = onItemClicked,
                             onItemLongClicked = onItemLongClicked,
+                            onItemDoubleClicked = onItemDoubleClicked
                         )
 
                         AnimatedVisibility(
@@ -146,6 +149,7 @@ private fun <T:SelectableItemBase> SelectableLazyList(
     scrollTo: Int = 0,
     onItemClicked: (item: T, position: Int) -> Unit,
     onItemLongClicked: (item: T, position: Int) -> Unit,
+    onItemDoubleClicked: (item: T, position: Int) -> Unit,
 ) {
 
 
@@ -163,6 +167,9 @@ private fun <T:SelectableItemBase> SelectableLazyList(
                 Box(modifier = Modifier.combinedClickable (
                     onClick = {
                         onItemClicked(item,index)
+                    },
+                    onDoubleClick = {
+                        onItemDoubleClicked(item,index)
                     },
                     onLongClick = {
                         onItemLongClicked(item,index)

@@ -28,22 +28,23 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.launch
 
 /***
- * modifier - the modifier to apply to this layout.
- * list -  list of data.
- * selectedItemsList - a list contains selected items
- * view - the data view holder.
- * onItemClicked - callback when a item's been clicked
- * onItemLongClicked - callback when a item's been clicked
- * isMultiSelectionMode
- * dividerView - (optional) divider between items.
- * emptyView - (optional) emptyView if the list is empty.
- * actions - list of actions.
- * isLoading - show loading content progress.
- * loadingProgress - (optional) if null will show CircularProgressIndicator().
- * isRefreshing - show progress of the swipeRefreshLayout.
- * onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
- * scrollTo - scroll to item default is 0.
- * style - style is a class to add style all components in a list
+ * @modifier: the modifier to apply to this layout.
+ * @list: list of data.
+ * @selectedItemsList: A list contains selected items
+ * @view: The data view holder.
+ * @onItemClicked: A callback when a item's been clicked
+ * @onItemLongClicked: A callback when a item's been clicked
+ * @onItemDoubleClicked: A callback for item double-click events.
+ * @isMultiSelectionMode
+ * @dividerView - (optional) divider between items.
+ * @emptyView - (optional) emptyView if the list is empty.
+ * @actions - list of actions.
+ * @isLoading - show loading content progress.
+ * @loadingProgress - (optional) if null will show CircularProgressIndicator().
+ * @isRefreshing - show progress of the swipeRefreshLayout.
+ * @onRefresh - (optional) callback when the swipeRefreshLayout swapped if null the list will wrapped without the swipeRefreshLayout .
+ * @scrollTo - scroll to item default is 0.
+ * @style - style is a class to add style all components in a list
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -59,6 +60,7 @@ fun <T : SelectableItemBase> VerticalSelectablePagedList(
     unselectedSelectionView: (@Composable () -> Unit)? = null,
     onItemClicked: (item: T, position: Int) -> Unit,
     onItemLongClicked: (item: T, position: Int) -> Unit,
+    onItemDoubleClicked: (item: T, position: Int) -> Unit,
     actions: List<SelectableAction<T>> = listOf(),
     isMultiSelectionMode: Boolean = false,
     style: SelectableListStyle = SelectableListStyle.Default,
@@ -101,6 +103,7 @@ fun <T : SelectableItemBase> VerticalSelectablePagedList(
                             scrollTo = scrollTo,
                             onItemClicked = onItemClicked,
                             onItemLongClicked = onItemLongClicked,
+                            onItemDoubleClicked = onItemDoubleClicked
                         )
 
                         AnimatedVisibility(
@@ -145,6 +148,7 @@ private fun <T : SelectableItemBase> SelectableLazyPagedList(
     scrollTo: Int = 0,
     onItemClicked: (item: T, position: Int) -> Unit,
     onItemLongClicked: (item: T, position: Int) -> Unit,
+    onItemDoubleClicked: (item: T, position: Int) -> Unit,
 ) {
 
 
@@ -168,6 +172,8 @@ private fun <T : SelectableItemBase> SelectableLazyPagedList(
                         modifier = Modifier.combinedClickable(
                             onClick = {
                                 onItemClicked(item, index)
+                            }, onDoubleClick = {
+                                onItemDoubleClicked(item, index)
                             },
                             onLongClick = {
                                 onItemLongClicked(item, index)
@@ -177,6 +183,7 @@ private fun <T : SelectableItemBase> SelectableLazyPagedList(
                         SelectableListItem(
                             item = item,
                             view = view,
+                            isSelected = selectedItemsList.contains(item),
                             selectedSelectionView=selectedSelectionView,
                             unselectedSelectionView = unselectedSelectionView,
                             dividerView = dividerView,
